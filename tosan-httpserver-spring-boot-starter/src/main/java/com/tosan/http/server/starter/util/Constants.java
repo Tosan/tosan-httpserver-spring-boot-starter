@@ -15,8 +15,8 @@ public interface Constants {
      * standard header names
      */
     String X_REQUEST_ID = "X-Request-ID";
-    String X_FORWARDED_FOR = "X_Forwarded_For";
-    String X_USER_IP = "X_User_IP";
+    String X_FORWARDED_FOR = "X-Forwarded-For";
+    String X_USER_IP = "X-User-IP";
 
     /**
      * constant default filter exclude patterns
@@ -29,15 +29,17 @@ public interface Constants {
     /**
      * constant mdc param names
      */
-    String REMOTE_USER_IP_PARAMETER_NAME = "userIP";
-    String X_REQUEST_ID_PARAMETER_NAME = "requestId";
-    String CLIENT_IP_PARAMETER_NAME = "clientIP";
+    String MDC_REQUEST_ID = "requestId";
+    String MDC_USER_IP = "userIP";
+    String MDC_USER_FREE_IP = "user-IP";
+    String MDC_CLIENT_IP = "clientIP";
+    String MDC_CLIENT_FREE_IP = "client-IP";
 
     /**
      * constant header mdc parameters
      */
     HttpHeaderMdcParameter X_REQUEST_ID_MDC_PARAM = new HttpHeaderMdcParameter.
-            HttpHeaderMdcParameterBuilder(X_REQUEST_ID, X_REQUEST_ID_PARAMETER_NAME).randomParameter(
+            HttpHeaderMdcParameterBuilder(X_REQUEST_ID, MDC_REQUEST_ID).randomParameter(
             new RandomParameter(RandomGenerationType.ALPHANUMERIC, 8)).build();
 
     /**

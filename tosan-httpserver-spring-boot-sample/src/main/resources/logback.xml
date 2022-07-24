@@ -3,15 +3,83 @@
     <property name="ROOT_LEVEL" value="DEBUG"/>
     <property name="APPLICATION_LEVEL" value="INFO"/>
     <property name="STACK_TRACE_COUNT" value="15"/>
-    <property name="CLASS_NAME_LENGTH" value="40"/>
+    <property name="APPLICATION_NAME" value="testApplication"/>
 
     <property name="PATTERN" scope="context"
-              value="%date{yyyy-MM-dd'T'HH:mm:ss.SSS} %-7([%level]) requestId:[%mdc{requestId}] channel:[%-15(%mdc{userIP})] thread:[%-25.25(%thread)] client:[%mdc{client-Address}] %logger{40}.%method@%line:%n    %message %rootException{${STACK_TRACE_COUNT}}%n"/>
+              value="%date{yyyy-MM-dd'T'HH:mm:ss.SSS} %-7([%level]) requestId:[%mdc{requestId}] clientIP:[%-15(%mdc{clientIP})] thread:[%-25.25(%thread)] userIP:[%mdc{userIP}] %logger{40}.%method@%line:%n    %message %rootException{${STACK_TRACE_COUNT}}%n"/>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${PATTERN}</pattern>
         </encoder>
+    </appender>
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/${APPLICATION_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/${APPLICATION_NAME}-%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+            <maxFileSize>200MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <appender name="AsyncRolling" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ROLLING"/>
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <appender name="ClientIpSIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <Key>client-IP</Key>
+            <DefaultValue>${APPLICATION_NAME}</DefaultValue>
+        </discriminator>
+        <sift>
+            <appender name="ROLLING-${client-IP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <append>false</append>
+                <file>logs/clients/${client-IP}/${client-IP}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>logs/clients/${client-IP}/${client-IP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+                    <maxFileSize>200MB</maxFileSize>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${PATTERN}</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+    <appender name="AsyncClientIpSIFT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="ClientIpSIFT"/>
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <appender name="UserIpSIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <Key>user-IP</Key>
+            <DefaultValue>${APPLICATION_NAME}</DefaultValue>
+        </discriminator>
+        <sift>
+            <appender name="ROLLING-${user-IP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <append>false</append>
+                <file>logs/users/${user-IP}/${user-IP}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>logs/users/${user-IP}/${user-IP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+                    <maxFileSize>200MB</maxFileSize>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>${PATTERN}</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+    <appender name="AsyncUserIpSIFT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="UserIpSIFT"/>
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <includeCallerData>true</includeCallerData>
     </appender>
 
     <!--disable jetty default debug log on debug mode-->
@@ -19,5 +87,11 @@
 
     <root level="${ROOT_LEVEL}">
         <appender-ref ref="CONSOLE"/>
-    </root>
+<!--        <appender-ref ref="ROLLING"/>-->
+<!--        <appender-ref ref="AsyncRolling"/>-->
+<!--        <appender-ref ref="ClientIpSIFT"/>-->
+<!--        <appender-ref ref="AsyncClientIpSIFT"/>-->
+<!--        <appender-ref ref="UserIpSIFT"/>-->
+<!--        <appender-ref ref="AsyncUserIpSIFT"/>-->
+     </root>
 </configuration>

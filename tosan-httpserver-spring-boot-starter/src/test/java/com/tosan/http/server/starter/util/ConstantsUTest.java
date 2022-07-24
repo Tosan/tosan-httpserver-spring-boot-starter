@@ -7,7 +7,7 @@ import com.tosan.tools.mask.starter.config.SecureParameter;
 import org.junit.jupiter.api.Test;
 
 import static com.tosan.http.server.starter.util.Constants.X_REQUEST_ID;
-import static com.tosan.http.server.starter.util.Constants.X_REQUEST_ID_PARAMETER_NAME;
+import static com.tosan.http.server.starter.util.Constants.MDC_REQUEST_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -24,13 +24,13 @@ public class ConstantsUTest {
 
     @Test
     public void checkRemoteClientIpParameter() {
-        String parameter = Constants.REMOTE_USER_IP_PARAMETER_NAME;
+        String parameter = Constants.MDC_USER_IP;
         assertEquals("userIP", parameter);
     }
 
     @Test
     public void checkRequestIdParameter() {
-        String parameter = X_REQUEST_ID_PARAMETER_NAME;
+        String parameter = MDC_REQUEST_ID;
         assertEquals("requestId", parameter);
     }
 
@@ -38,7 +38,7 @@ public class ConstantsUTest {
     public void checkXRequestIdMdcParam() {
         HttpHeaderMdcParameter xRequestIdMdcParam = Constants.X_REQUEST_ID_MDC_PARAM;
         assertEquals(X_REQUEST_ID, xRequestIdMdcParam.getHeaderParameterName());
-        assertEquals(X_REQUEST_ID_PARAMETER_NAME, xRequestIdMdcParam.getMdcParametersName());
+        assertEquals(MDC_REQUEST_ID, xRequestIdMdcParam.getMdcParametersName());
         assertEquals(RandomGenerationType.ALPHANUMERIC, xRequestIdMdcParam.getRandomParameter().getGenerationType());
         assertEquals(8, xRequestIdMdcParam.getRandomParameter().getLength());
     }

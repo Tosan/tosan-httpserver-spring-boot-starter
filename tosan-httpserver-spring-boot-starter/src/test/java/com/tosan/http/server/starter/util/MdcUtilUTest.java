@@ -129,26 +129,48 @@ public class MdcUtilUTest {
     }
 
     @Test
-    public void testFillRemoteClientIp_nullRemoteAddress_noRemoteAddressInMdc() {
+    public void testFillRemoteClientIp_nullRemoteAddressAndNullXForward_noRemoteAddressInMdc() {
         ServletRequestAttributes servletRequestAttribute = mock(ServletRequestAttributes.class);
         requestContextHolderMockedStatic.when(() -> RequestContextHolder.getRequestAttributes()).thenReturn(servletRequestAttribute);
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
         when(servletRequestAttribute.getRequest()).thenReturn(httpServletRequest);
         when(httpServletRequest.getRemoteAddr()).thenReturn(null);
-        mdcUtil.fillRemoteClientIp();
-        assertNull(MDC.get("Remote-Client-IP"));
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(null);
+        mdcUtil.fillRemoteClientIp(request);
+        assertNull(MDC.get(Constants.MDC_CLIENT_IP));
     }
 
     @Test
-    public void testFillRemoteClientIp_haveRemoteAddress_fillRemoteAddressInMdc() {
+    public void testFillRemoteClientIp_haveRemoteAddressButNoExForwarded_fillRemoteAddressInMdc() {
         ServletRequestAttributes servletRequestAttribute = mock(ServletRequestAttributes.class);
         requestContextHolderMockedStatic.when(() -> RequestContextHolder.getRequestAttributes()).thenReturn(servletRequestAttribute);
         HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
         when(servletRequestAttribute.getRequest()).thenReturn(httpServletRequest);
         String remoteAddress = "127.0.0.1";
         when(httpServletRequest.getRemoteAddr()).thenReturn(remoteAddress);
-        mdcUtil.fillRemoteClientIp();
-        assertEquals(remoteAddress, MDC.get("userIP"));
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(null);
+        mdcUtil.fillRemoteClientIp(request);
+        assertEquals(remoteAddress, MDC.get(Constants.MDC_CLIENT_IP));
+    }
+
+    @Test
+    public void testFillRemoteClientIp_requestHaveXForwardedForHeader_fillRemoteAddressInMdc() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        String xForwardHeader = "192.178.4.20";
+        when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(xForwardHeader);
+        mdcUtil.fillRemoteClientIp(request);
+        assertEquals(xForwardHeader, MDC.get(Constants.MDC_CLIENT_IP));
+    }
+
+    @Test
+    public void testFillRemoteClientIp_requestHaveMultipleIpInXForwardedForHeader_fillRemoteAddressInMdc() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        String xForwardHeader = "192.178.4.20 , 194.180.3.4";
+        when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(xForwardHeader);
+        mdcUtil.fillRemoteClientIp(request);
+        assertEquals("192.178.4.20", MDC.get(Constants.MDC_CLIENT_IP));
     }
 
     @Test

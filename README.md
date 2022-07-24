@@ -111,8 +111,10 @@ specified characters it will replace it with new character.
 attention: MDCFilterConfig must be defined with bean name "http-server-util-mdc-filter-config". otherwise, other
 configuration beans must be defined as well.
 
-> in addition to parameters specified configuration remote client ip parameter will be extracted. this parameter will be placed 
-in MDC with parameter name: "userIP".
+in addition to parameters specified configuration remote client ip parameter will be extracted. this parameter will be placed 
+in MDC with parameter name: "clientIP". first (X_FORWARDED_FOR) header will be checked if it's not empty first ip address
+in this header will be placed in clientIp MDC (for example: for "192.168.16.49,192.168.16.50" header, this "192.168.16.49" will be selected) 
+otherwise the remote address in RequestContextHolder will be placed in clientIP MDC parameter.
 
 ### http log filter
 logging complete http request and response characteristic is an important feature in tracing request. many web servers

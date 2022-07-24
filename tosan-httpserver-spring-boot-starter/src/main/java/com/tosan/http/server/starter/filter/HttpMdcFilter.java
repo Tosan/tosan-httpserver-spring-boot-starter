@@ -31,7 +31,7 @@ public class HttpMdcFilter extends OncePerRequestFilterBase {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            mdcLogUtil.fillRemoteClientIp();
+            mdcLogUtil.fillRemoteClientIp(request);
             mdcLogUtil.extractHeaderMdcParameters(request);
             filterChain.doFilter(request, response);
         } finally {

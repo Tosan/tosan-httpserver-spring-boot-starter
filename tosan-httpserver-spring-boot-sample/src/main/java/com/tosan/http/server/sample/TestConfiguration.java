@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.tosan.http.server.sample.Constants.*;
 import static com.tosan.http.server.starter.util.Constants.*;
 
 /**
@@ -31,6 +30,7 @@ import static com.tosan.http.server.starter.util.Constants.*;
  */
 @Configuration
 public class TestConfiguration {
+    public static final String REQUEST_ID_PREFIX = "MCS-";
 
     @Bean("http-server-util-secured-parameters")
     public SecureParametersConfig secureParametersConfig() {
@@ -47,19 +47,19 @@ public class TestConfiguration {
     public MdcFilterConfig mdcFilterConfig() {
         List<HttpHeaderMdcParameter> list = new ArrayList<>();
         HttpHeaderMdcParameter requestId = new HttpHeaderMdcParameter
-                .HttpHeaderMdcParameterBuilder(X_REQUEST_ID, X_REQUEST_ID_PARAMETER_NAME)
+                .HttpHeaderMdcParameterBuilder(X_REQUEST_ID, MDC_REQUEST_ID)
                 .randomParameter(new RandomParameter(REQUEST_ID_PREFIX, RandomGenerationType.ALPHANUMERIC, 8))
                 .build();
-        HttpHeaderMdcParameter clientIp = new HttpHeaderMdcParameter
-                .HttpHeaderMdcParameterBuilder("ClientAddress", COMPLETE_CLIENT_ADDRESS_PARAMETER_NAME)
+        HttpHeaderMdcParameter userIp = new HttpHeaderMdcParameter
+                .HttpHeaderMdcParameterBuilder(X_USER_IP, MDC_USER_IP)
                 .build();
-        HttpHeaderMdcParameter clientIpReplacedFreeChar = new HttpHeaderMdcParameter
-                .HttpHeaderMdcParameterBuilder("ClientAddress", CLIENT_ADDRESS_PARAMETER_NAME)
+        HttpHeaderMdcParameter freeUserIp = new HttpHeaderMdcParameter
+                .HttpHeaderMdcParameterBuilder(X_USER_IP, MDC_USER_FREE_IP)
                 .removeUnfreeCharacters(true)
                 .build();
         list.add(requestId);
-        list.add(clientIp);
-        list.add(clientIpReplacedFreeChar);
+        list.add(userIp);
+        list.add(freeUserIp);
         char[] unfreeCharacters = {'/', '\\', ':', '*', '?', '"'};
         char newCharacter = '-';
         MdcFilterConfig mdcFilterConfig = new MdcFilterConfig(list, unfreeCharacters, newCharacter);

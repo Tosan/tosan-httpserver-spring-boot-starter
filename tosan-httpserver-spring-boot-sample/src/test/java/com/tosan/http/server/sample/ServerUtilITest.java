@@ -2,6 +2,7 @@ package com.tosan.http.server.sample;
 
 import com.tosan.http.server.sample.dto.TestRequestDto;
 import com.tosan.http.server.sample.dto.TestResponseDto;
+import com.tosan.http.server.starter.util.Constants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 
 import java.util.Collections;
 import java.util.HashMap;
-
-import static com.tosan.http.server.starter.util.Constants.X_REQUEST_ID;
 
 /**
  * @author mina khoshnevisan
@@ -50,7 +49,8 @@ public class ServerUtilITest {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
 //                    request.getHeaders().add(X_REQUEST_ID, "val453453ue");
-                    request.getHeaders().add("ClientAddress", "192.168.170.23");
+                    request.getHeaders().add(Constants.X_USER_IP, "192.168.16.23");
+                    request.getHeaders().add(Constants.X_FORWARDED_FOR, "192.168.16.49,192.168.16.50");
                     request.getHeaders().add("username", "mina948j");
                     request.getHeaders().add("context", "{\"secretKey\":\"456677\", \"test\":\"minaName\"}");
                     return execution.execute(request, body);

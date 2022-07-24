@@ -34,7 +34,7 @@ public class HttpMdcFilterUTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
         httpMdcFilter.doFilterInternal(request, response, filterChain);
-        verify(mdcLogUtil, times(1)).fillRemoteClientIp();
+        verify(mdcLogUtil, times(1)).fillRemoteClientIp(request);
         verify(mdcLogUtil, times(1)).extractHeaderMdcParameters(eq(request));
         verify(filterChain, times(1)).doFilter(eq(request), eq(response));
         verify(mdcLogUtil, times(1)).clear();
@@ -47,7 +47,7 @@ public class HttpMdcFilterUTest {
         FilterChain filterChain = mock(FilterChain.class);
         doThrow(new ServletException()).when(filterChain).doFilter(eq(request), eq(response));
         assertThrows(ServletException.class, () -> httpMdcFilter.doFilterInternal(request, response, filterChain));
-        verify(mdcLogUtil, times(1)).fillRemoteClientIp();
+        verify(mdcLogUtil, times(1)).fillRemoteClientIp(request);
         verify(mdcLogUtil, times(1)).extractHeaderMdcParameters(eq(request));
         verify(filterChain, times(1)).doFilter(eq(request), eq(response));
         verify(mdcLogUtil, times(1)).clear();

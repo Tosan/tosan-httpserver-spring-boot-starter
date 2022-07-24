@@ -74,10 +74,19 @@ public class MdcUtil {
         return inputString;
     }
 
-    public void fillRemoteClientIp() {
-        String remoteAddress = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRemoteAddr();
-        if (remoteAddress != null) {
-            MDC.put(Constants.REMOTE_USER_IP_PARAMETER_NAME, remoteAddress);
+    public void fillRemoteClientIp(HttpServletRequest request) {
+        String clientIp = request.getHeader(Constants.X_FORWARDED_FOR);
+        if (StringUtils.isNotEmpty(clientIp)) {
+            int clientAddressIndex = clientIp.indexOf(',');
+            if (clientAddressIndex > -1) {
+                clientIp = clientIp.substring(0, clientAddressIndex);
+            }
+        } else {
+            clientIp = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRemoteAddr();
+        }
+        if (clientIp != null) {
+            MDC.put(Constants.MDC_CLIENT_IP, clientIp.trim());
+            MDC.put(Constants.MDC_CLIENT_FREE_IP, (replaceUnfreeChars(clientIp)).trim());
         }
     }
 
