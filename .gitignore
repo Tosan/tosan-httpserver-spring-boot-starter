@@ -1,0 +1,18 @@
+### Runtime ###
+*.pid
+logs/
+*.log
+
+### Maven ###
+target/
+.mvn
+!**/src/main/**/target/
+!**/src/test/**/target/
+mvnw
+mvnw.cmd
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

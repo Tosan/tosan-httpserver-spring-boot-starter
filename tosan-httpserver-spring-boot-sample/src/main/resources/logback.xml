@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="1 minutes">
+    <property name="ROOT_LEVEL" value="DEBUG"/>
+    <property name="APPLICATION_LEVEL" value="INFO"/>
+    <property name="STACK_TRACE_COUNT" value="15"/>
+    <property name="CLASS_NAME_LENGTH" value="40"/>
+
+    <property name="PATTERN" scope="context"
+              value="%date{yyyy-MM-dd'T'HH:mm:ss.SSS} %-7([%level]) requestId:[%mdc{requestId}] channel:[%-15(%mdc{userIP})] thread:[%-25.25(%thread)] client:[%mdc{client-Address}] %logger{40}.%method@%line:%n    %message %rootException{${STACK_TRACE_COUNT}}%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--disable jetty default debug log on debug mode-->
+    <logger name="org.eclipse.jetty" additivity="true" level="INFO"/>
+
+    <root level="${ROOT_LEVEL}">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.tosan.http.server.starter.configuration.HttpServerUtilConfiguration
