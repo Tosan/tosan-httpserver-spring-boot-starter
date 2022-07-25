@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false" scan="true" scanPeriod="1 minutes">
-    <property name="ROOT_LEVEL" value="INFO"/>
+    <property name="ROOT_LEVEL" value="WARN"/>
     <property name="APPLICATION_LEVEL" value="INFO"/>
     <property name="STACK_TRACE_COUNT" value="15"/>
     <property name="APPLICATION_NAME" value="testApplication"/>
@@ -32,15 +32,15 @@
 
     <appender name="ClientIpSIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>
-            <Key>client-IP</Key>
+            <Key>clientIP</Key>
             <DefaultValue>${APPLICATION_NAME}</DefaultValue>
         </discriminator>
         <sift>
-            <appender name="ROLLING-${client-IP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <appender name="ROLLING-${clientIP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <append>false</append>
-                <file>logs/clients/${client-IP}/${client-IP}.log</file>
+                <file>logs/clients/${clientIP}/${clientIP}.log</file>
                 <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                    <fileNamePattern>logs/clients/${client-IP}/${client-IP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+                    <fileNamePattern>logs/clients/${clientIP}/${clientIP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
                     <maxFileSize>200MB</maxFileSize>
                 </rollingPolicy>
                 <encoder>
@@ -58,15 +58,15 @@
 
     <appender name="UserIpSIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
         <discriminator>
-            <Key>user-IP</Key>
+            <Key>userIP</Key>
             <DefaultValue>${APPLICATION_NAME}</DefaultValue>
         </discriminator>
         <sift>
-            <appender name="ROLLING-${user-IP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <appender name="ROLLING-${userIP}" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <append>false</append>
-                <file>logs/users/${user-IP}/${user-IP}.log</file>
+                <file>logs/users/${userIP}/${userIP}.log</file>
                 <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                    <fileNamePattern>logs/users/${user-IP}/${user-IP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
+                    <fileNamePattern>logs/users/${userIP}/${userIP}.%d{yyyy-MM-dd_HH}.%i.log.zip</fileNamePattern>
                     <maxFileSize>200MB</maxFileSize>
                 </rollingPolicy>
                 <encoder>
@@ -84,6 +84,10 @@
 
     <!--disable jetty default debug log on debug mode-->
     <logger name="org.eclipse.jetty" additivity="true" level="INFO"/>
+
+    <logger name="com.tosan" additivity="true">
+        <level value="${APPLICATION_LEVEL}"/>
+    </logger>
 
     <root level="${ROOT_LEVEL}">
         <appender-ref ref="CONSOLE"/>

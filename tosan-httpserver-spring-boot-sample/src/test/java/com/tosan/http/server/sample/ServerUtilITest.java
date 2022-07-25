@@ -33,7 +33,7 @@ public class ServerUtilITest {
     }
 
     @Test
-    public void greetingShouldReturnDefaultMessage() {
+    public void testService() {
         TestRequestDto dto = new TestRequestDto();
         dto.setTest("testValue");
         dto.setPan("4039484849393094");
@@ -42,7 +42,6 @@ public class ServerUtilITest {
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
                 "/httpserver/test", dto, TestResponseDto.class, new HashMap<>());
-        System.out.println("testResponseDto = " + testResponseDto);
     }
 
     public void setHeader() {

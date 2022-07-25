@@ -60,7 +60,7 @@ public class TestConfiguration {
         list.add(requestId);
         list.add(userIp);
         list.add(freeUserIp);
-        char[] unfreeCharacters = {'/', '\\', ':', '*', '?', '"'};
+        char[] unfreeCharacters = {'/', '\\', '*', '?', '"'};
         char newCharacter = '-';
         MdcFilterConfig mdcFilterConfig = new MdcFilterConfig(list, unfreeCharacters, newCharacter);
         return mdcFilterConfig;

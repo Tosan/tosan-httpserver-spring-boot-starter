@@ -98,7 +98,7 @@ to true. these unfree characters and new character can be configured as below:
                 .removeUnfreeCharacters(true)
                 .build();
         list.add(clientIp);
-        char[] unfreeCharacters = {'/', '\\', ':', '*', '?', '"'};
+        char[] unfreeCharacters = {'/', '\\', '*', '?', '"'};
         char newCharacter = '-';
         MdcFilterConfig mdcFilterConfig = new MdcFilterConfig(list, unfreeCharacters, newCharacter);
         return mdcFilterConfig;

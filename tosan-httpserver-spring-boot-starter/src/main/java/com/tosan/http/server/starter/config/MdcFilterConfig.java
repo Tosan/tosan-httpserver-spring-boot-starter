@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class MdcFilterConfig {
     private List<HttpHeaderMdcParameter> parameters;
-    private char[] unFreeChars = {'/', '\\', ':', '*', '?', '"', '<', '>', '|'};
+    private char[] unFreeChars = {'/', '\\', '*', '?', '"', '<', '>', '|'};
     private char newChar = '-';
 
     public MdcFilterConfig(List<HttpHeaderMdcParameter> parameters) {
