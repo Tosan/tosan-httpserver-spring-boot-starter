@@ -89,8 +89,8 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     protected static String writeJson(Object object) {
         try {
             return writer.writeValueAsString(object);
-        } catch (JsonProcessingException var2) {
-            return "error creating json. " + var2.getMessage();
+        } catch (JsonProcessingException e) {
+            return "error creating json. " + e.getMessage();
         }
     }
 }

@@ -52,6 +52,7 @@
     <properties>
         <java.version>8</java.version>
         <tosan-mask-spring-boot-starter.version>1.0.0</tosan-mask-spring-boot-starter.version>
+        <tosan-tostring-builder.version>1.0.2</tosan-tostring-builder.version>
     </properties>
 
     <dependencyManagement>
@@ -65,6 +66,11 @@
                 <groupId>com.tosan.server.http</groupId>
                 <artifactId>tosan-httpserver-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.tosan.tools</groupId>
+                <artifactId>tosan-tostring-builder</artifactId>
+                <version>${tosan-tostring-builder.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

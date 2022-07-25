@@ -22,7 +22,6 @@ public class TestController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public TestResponseDto testService(@RequestBody TestRequestDto dto) {
-        log.info(dto.toString());
         TestResponseDto testResponseDto = new TestResponseDto();
         testResponseDto.setSecretKey("secret");
         testResponseDto.setPassword("954595");

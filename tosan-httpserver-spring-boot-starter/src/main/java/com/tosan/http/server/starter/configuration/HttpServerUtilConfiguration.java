@@ -1,5 +1,6 @@
 package com.tosan.http.server.starter.configuration;
 
+import com.tosan.http.server.starter.aspect.ServiceLogAspect;
 import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.filter.HttpLoggingFilter;
@@ -8,6 +9,7 @@ import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.util.Constants;
 import com.tosan.http.server.starter.util.HttpLogUtil;
 import com.tosan.http.server.starter.util.MdcUtil;
+import com.tosan.http.server.starter.util.ServiceLogUtil;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
@@ -93,5 +95,15 @@ public class HttpServerUtilConfiguration {
         List<HttpHeaderMdcParameter> list = new ArrayList<>();
         list.add(Constants.X_REQUEST_ID_MDC_PARAM);
         return new MdcFilterConfig(list);
+    }
+
+    @Bean
+    public ServiceLogAspect serviceLogAspect(ServiceLogUtil serviceLogUtil) {
+        return new ServiceLogAspect(serviceLogUtil);
+    }
+
+    @Bean
+    public ServiceLogUtil serviceLogUtil() {
+        return new ServiceLogUtil();
     }
 }

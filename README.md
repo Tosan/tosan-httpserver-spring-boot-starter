@@ -231,6 +231,8 @@ url patterns without default patterns.
     }
 ```
 
+attention: HttpLogFilter only register http logs in DEBUG mode. 
+
 ### statistics filter
 HttpStatisticsFilter is created for purpose of logging simple metrics about http requests.
 this filter logs some metrics as below:
@@ -258,6 +260,13 @@ you can add your desired exclude url patterns by creating HttpStatisticFilter be
         return httpStatisticsFilter;
     }
 ```
+
+### ServiceLogAspect
+this aspect is for logging request and response/exception after converting http request to application dto and before
+changing response dto to Http response. this aspects work on each public method of any class annotated with @RequestMapping
+and run in INFO log mode. this aspect uses DTO toString method to create log. so you can customize your toString method as 
+desired. in this library we used 'tosan-tostring-builder' for building toString methods. you can see a sample of this 
+library in [TestRequestDto](./tosan-httpserver-spring-boot-sample/src/main/java/com/tosan/http/server/sample/dto/TestRequestDto.java)
 
 ### Sample Project
 You can find a sample project in tosan-httpserver-spring-boot-sample module

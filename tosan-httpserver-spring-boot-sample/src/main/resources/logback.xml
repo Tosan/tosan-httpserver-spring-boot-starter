@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false" scan="true" scanPeriod="1 minutes">
-    <property name="ROOT_LEVEL" value="DEBUG"/>
+    <property name="ROOT_LEVEL" value="INFO"/>
     <property name="APPLICATION_LEVEL" value="INFO"/>
     <property name="STACK_TRACE_COUNT" value="15"/>
     <property name="APPLICATION_NAME" value="testApplication"/>
