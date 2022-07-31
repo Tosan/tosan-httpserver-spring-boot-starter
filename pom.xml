@@ -12,7 +12,7 @@
     <groupId>com.tosan.server.http</groupId>
     <artifactId>tosan-httpserver-spring-boot-root</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
 
     <name>tosan-httpserver-spring-boot-starter</name>
     <description>This project provides an Spring-Boot Starter that facilitate common requirements of a rest server like
@@ -46,7 +46,7 @@
         <connection>scm:git:https://github.com/Tosan/tosan-httpserver-spring-boot-starter.git</connection>
         <developerConnection>scm:git:https://github.com/Tosan/tosan-httpserver-spring-boot-starter.git</developerConnection>
         <url>https://github.com/Tosan/tosan-httpserver-spring-boot-starter</url>
-        <tag>HEAD</tag>
+        <tag>v1.0.4</tag>
     </scm>
 
     <properties>
