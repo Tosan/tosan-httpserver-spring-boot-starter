@@ -121,7 +121,9 @@ logging complete http request and response characteristic is an important featur
 provide this ability but might lack in some aspects like masking sensitive data before logging. this library uses provided 
 servlet api in order to work with different web servers. these embedded web servers are supported in this library:
 > tomcat
+
 > jetty
+
 > undertow
 
 sample of http request and response is logged as below:
@@ -231,7 +233,11 @@ url patterns without default patterns.
     }
 ```
 
-attention: HttpLogFilter only register http logs in DEBUG mode. 
+attention: HttpLogFilter only register http logs in DEBUG mode. and this filter only supports below media types:
+
+1- application/json
+
+2- application/x-www-form-urlencoded
 
 ### statistics filter
 HttpStatisticsFilter is created for purpose of logging simple metrics about http requests.

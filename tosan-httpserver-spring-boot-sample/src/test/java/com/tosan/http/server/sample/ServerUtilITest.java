@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
 import java.util.Collections;
@@ -42,6 +45,26 @@ public class ServerUtilITest {
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
                 "/httpserver/test", dto, TestResponseDto.class, new HashMap<>());
+    }
+
+    @Test
+    public void testFormURlEncodeService() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("PRIVATE-TOKEN", "xyz");
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("parameter1", "feature");
+        map.add("parameter2", "#5843AD");
+        map.add("secretKey", "#548534953939");
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+
+        ResponseEntity<Object> response =
+                restTemplate.exchange("/httpserver/confirm",
+                        HttpMethod.POST,
+                        entity,
+                        Object.class);
     }
 
     public void setHeader() {

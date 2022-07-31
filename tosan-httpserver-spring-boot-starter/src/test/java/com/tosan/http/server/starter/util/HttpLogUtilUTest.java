@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
+import java.util.*;
 
 import static com.tosan.http.server.starter.TestLogUtil.getAppenderList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +46,7 @@ public class HttpLogUtilUTest {
         when(response.getStatus()).thenReturn(responseStatus);
         jsonReplaceResultDto = mock(JsonReplaceResultDto.class);
         when(replaceHelperDecider.checkJsonAndReplace(any())).thenReturn(jsonReplaceResultDto);
+        when(request.getContentType()).thenReturn("application/json");
     }
 
     @Test
@@ -170,7 +168,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "[1 bytes content]");
+        assertEquals(messageSplit[4], "unsupported media type");
     }
 
     @Test
@@ -190,6 +188,66 @@ public class HttpLogUtilUTest {
     }
 
     @Test
+    public void testLogRequest_withFormUrlEncodedTypeWithNullParameterMap_emptyParameters() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(request.getQueryString()).thenReturn(null);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
+        when(request.getParameterMap()).thenReturn(null);
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[4], "form parameters:");
+        verify(replaceHelperDecider, times(0)).replace(anyString(), anyString());
+    }
+
+    @Test
+    public void testLogRequest_withFormUrlEncodedTypeWithEmptyValues_logParameterKey() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(request.getQueryString()).thenReturn(null);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
+        Map<String, String[]> parameterMap = new HashMap<>();
+        String parameterKey = "testKey";
+        parameterMap.put(parameterKey, null);
+        when(request.getParameterMap()).thenReturn(parameterMap);
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[4], "form parameters:");
+        assertEquals(messageSplit[5], parameterKey + " : ");
+        verify(replaceHelperDecider, times(0)).replace(anyString(), anyString());
+    }
+
+    @Test
+    public void testLogRequest_withFormUrlEncodedTypeWithFilledValues_logMaskedParameterValues() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(request.getQueryString()).thenReturn(null);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
+        String parameterKey = "testKey";
+        Map<String, String[]> parameterMap = new HashMap<>();
+        String[] values = new String[2];
+        String testValue1 = "testValue1";
+        values[0] = testValue1;
+        String testValue2 = "testValue2";
+        values[1] = testValue2;
+        parameterMap.put(parameterKey, values);
+        when(request.getParameterMap()).thenReturn(parameterMap);
+        String maskedValue1 = "maskedValue1";
+        when(replaceHelperDecider.replace(eq(parameterKey), eq(testValue1))).thenReturn(maskedValue1);
+        String maskedValue2 = "maskedValue2";
+        when(replaceHelperDecider.replace(eq(parameterKey), eq(testValue2))).thenReturn(maskedValue2);
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[4], "form parameters:");
+        assertEquals(messageSplit[5], parameterKey + " : " + maskedValue1 + "," + maskedValue2);
+        verify(replaceHelperDecider, times(0)).replace(anyString());
+    }
+
+
+    /*@Test
     public void testLogRequest_withApplicationXmlType_showXmlWithoutCallingReplaceHelper() throws IOException {
         ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
@@ -202,7 +260,7 @@ public class HttpLogUtilUTest {
         String[] messageSplit = message.split("\n");
         assertEquals(messageSplit[4], bodyValue);
         verify(replaceHelperDecider, times(0)).replace(anyString(), any());
-    }
+    }*/
 
     @Test
     public void testLogRequest_withInvalidBody_logErrorInRequestBody() throws IOException {
@@ -337,7 +395,7 @@ public class HttpLogUtilUTest {
         verify(replaceHelperDecider, times(1)).replace(anyString());
     }
 
-    @Test
+    /*@Test
     public void testLogResponse_withApplicationXmlType_showXmlWithoutCallingReplaceHelper() throws IOException {
         ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
@@ -349,5 +407,5 @@ public class HttpLogUtilUTest {
         String[] messageSplit = message.split("\n");
         assertEquals(messageSplit[4], bodyValue);
         verify(replaceHelperDecider, times(0)).replace(anyString());
-    }
+    }*/
 }
