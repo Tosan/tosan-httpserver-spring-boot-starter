@@ -3,6 +3,7 @@ package com.tosan.http.server.starter.util;
 import com.tosan.http.server.starter.wrapper.CustomHttpServletRequestWrapper;
 import com.tosan.tools.mask.starter.dto.JsonReplaceResultDto;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -110,6 +111,10 @@ public class HttpLogUtil {
     }
 
     private void logContent(byte[] content, String contentType, StringBuilder msg) {
+        if (StringUtils.isEmpty(contentType)) {
+            LOGGER.debug("no response content type");
+            return;
+        }
         MediaType mediaType = MediaType.valueOf(contentType);
         boolean visible = VISIBLE_TYPES.stream().anyMatch(visibleType -> visibleType.includes(mediaType));
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
@@ -125,7 +130,12 @@ public class HttpLogUtil {
     }
 
     private void logRequestContent(CustomHttpServletRequestWrapper request, StringBuilder msg) throws IOException {
-        MediaType mediaType = MediaType.valueOf(request.getContentType());
+        String contentType = request.getContentType();
+        if (StringUtils.isEmpty(contentType)) {
+            LOGGER.debug("no request content type");
+            return;
+        }
+        MediaType mediaType = MediaType.valueOf(contentType);
         boolean visible = VISIBLE_TYPES.stream().anyMatch(visibleType -> visibleType.includes(mediaType));
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
         if (visible) {
