@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -42,9 +43,16 @@ public class ServerUtilITest {
         dto.setPan("4039484849393094");
         dto.setName("mina");
         dto.setFamily("kh");
+        dto.setDate(new Date());
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
                 "/httpserver/test", dto, TestResponseDto.class, new HashMap<>());
+    }
+
+    @Test
+    public void testGetMethod() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/testGet", Object.class, new HashMap<>());
     }
 
     @Test
