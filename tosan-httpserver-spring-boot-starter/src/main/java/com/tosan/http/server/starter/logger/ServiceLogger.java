@@ -1,6 +1,7 @@
 package com.tosan.http.server.starter.logger;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,8 @@ public abstract class ServiceLogger {
         long startTime = System.currentTimeMillis();
         try {
             if (logger.isInfoEnabled()) {
-                logger.info(getRequestLog(serviceName, pjp.getArgs()));
+                String[] parameterNames = ((MethodSignature) pjp.getSignature()).getParameterNames();
+                logger.info(getRequestLog(serviceName, pjp.getArgs(), parameterNames));
             }
             Object result = pjp.proceed();
             if (logger.isInfoEnabled()) {
@@ -40,7 +42,7 @@ public abstract class ServiceLogger {
         this.systemName = systemName;
     }
 
-    public abstract String getRequestLog(String serviceName, Object[] methodArgs);
+    public abstract String getRequestLog(String serviceName, Object[] methodArgs, String[] parameterNames);
 
     public abstract String getResponseLog(String serviceName, Object result, Double duration);
 

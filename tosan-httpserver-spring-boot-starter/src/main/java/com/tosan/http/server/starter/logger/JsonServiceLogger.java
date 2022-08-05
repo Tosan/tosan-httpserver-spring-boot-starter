@@ -2,27 +2,28 @@ package com.tosan.http.server.starter.logger;
 
 
 import com.tosan.http.server.starter.util.ToStringJsonUtil;
-import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Mostafa Abdollahi
  * @since 6/9/2021
  */
-@Component
 public class JsonServiceLogger extends ServiceLogger {
 
     @Override
-    public String getRequestLog(String serviceName, Object[] methodArgs) {
-        return createJson(serviceName, "request", methodArgs, null);
+    public String getRequestLog(String serviceName, Object[] methodArgs, String[] parameterNames) {
+        return createJson(serviceName, "request", methodArgs, parameterNames, null);
     }
 
     @Override
     public String getResponseLog(String serviceName, Object result, Double duration) {
-        return createJson(serviceName, "response", new Object[]{result}, duration);
+        return createJson(serviceName, "response", new Object[]{result}, null, duration);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class JsonServiceLogger extends ServiceLogger {
         exception.put("message", ex.getMessage());
         exception.put("localizedMessage", ex.getLocalizedMessage());
         exception.put("stackTrace", getStackTrace(ex));
-        return createJson(serviceName, "exception", new Object[]{exception}, duration);
+        return createJson(serviceName, "exception", new Object[]{exception}, null, duration);
     }
 
     private String getStackTrace(final Throwable throwable) {
@@ -45,7 +46,7 @@ public class JsonServiceLogger extends ServiceLogger {
         return stackTrace.getBuffer().toString();
     }
 
-    private String createJson(String serviceName, String key, Object[] objects, Double duration) {
+    private String createJson(String serviceName, String key, Object[] objects, Object[] parameterNames, Double duration) {
         Map<String, Object> object = new LinkedHashMap<>(3);
         object.put("service", serviceName);
         if (duration != null) {
@@ -53,13 +54,25 @@ public class JsonServiceLogger extends ServiceLogger {
         }
         if (objects != null) {
             Map<String, Object> objectsMap = new LinkedHashMap<>(objects.length);
-            for (Object obj : objects) {
-                if (obj != null) {
-                    objectsMap.put(obj.getClass().getSimpleName(), obj);
+            for (int i = 0; i < objects.length; i++) {
+                Object obj = objects[i];
+                if (obj != null && !ignoreArgument(obj)) {
+                    if (parameterNames != null && parameterNames.length > i && parameterNames[i] != null) {
+                        objectsMap.put((String) parameterNames[i], obj);
+                    } else {
+                        objectsMap.put(obj.getClass().getSimpleName(), obj);
+                    }
                 }
             }
             object.put(key, objectsMap);
         }
         return ToStringJsonUtil.toJson(object);
+    }
+
+    public boolean ignoreArgument(Object object) {
+        if (object instanceof HttpServletRequest) {
+            return true;
+        }
+        return false;
     }
 }

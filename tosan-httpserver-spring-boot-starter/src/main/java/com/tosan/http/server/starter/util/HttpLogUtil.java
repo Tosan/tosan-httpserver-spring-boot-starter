@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
@@ -20,7 +19,6 @@ import java.util.stream.Stream;
  * @author M.khoshnevisan
  * @since 4/19/2021
  */
-@Component
 public class HttpLogUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpLogUtil.class);
@@ -62,7 +60,8 @@ public class HttpLogUtil {
         if (queryString == null) {
             requestLog.append(String.format("%s %s", request.getMethod(), request.getRequestURI())).append("\n");
         } else {
-            requestLog.append(String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), queryString)).append("\n");
+            String maskedQueryString = maskQueryString(queryString);
+            requestLog.append(String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), maskedQueryString)).append("\n");
         }
         final Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
@@ -71,6 +70,26 @@ public class HttpLogUtil {
                             .forEach(headerValue -> addHeaders(requestLog, headerName, headerValue)));
         }
         requestLog.append("\n");
+    }
+
+    private String maskQueryString(String queryString) {
+        if (StringUtils.isEmpty(queryString)) {
+            return queryString;
+        }
+        StringBuilder result = new StringBuilder();
+        String[] queryParams = queryString.split("&");
+        for (String queryParam : queryParams) {
+            String[] fieldValueSplit = queryParam.split("=");
+            if (fieldValueSplit.length == 2) {
+                String maskedValue = replaceHelperDecider.replace(fieldValueSplit[0], fieldValueSplit[1]);
+                result.append(fieldValueSplit[0] + "=" + maskedValue);
+            } else {
+                result.append(queryParam);
+            }
+            result.append("&");
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
     }
 
     private void logResponseHeaders(ContentCachingResponseWrapper response, StringBuilder responseLog) {
@@ -112,7 +131,6 @@ public class HttpLogUtil {
 
     private void logContent(byte[] content, String contentType, StringBuilder msg) {
         if (StringUtils.isEmpty(contentType)) {
-            LOGGER.debug("no response content type");
             return;
         }
         MediaType mediaType = MediaType.valueOf(contentType);
@@ -132,7 +150,6 @@ public class HttpLogUtil {
     private void logRequestContent(CustomHttpServletRequestWrapper request, StringBuilder msg) throws IOException {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
-            LOGGER.debug("no request content type");
             return;
         }
         MediaType mediaType = MediaType.valueOf(contentType);

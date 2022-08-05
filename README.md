@@ -53,14 +53,20 @@ in order to specify mdc parameters processed by HttpMdcFilter, MdcFilterConfig m
 this config consist mainly of a list of HttpHeaderMdcParameter object that have below parameters:
 
 > headerParameterName: parameter name define in http request header
+
 > mdcParametersName: parameter name in MDC
+
 > replaceUnfreeCharacters: check unfree characters and replace to new character
+
 > randomParameter: object related to parameter random generation if parameter is not sent in http request
 
 random parameter generation will be applied when random parameter is set and header parameter is not sent in http request.
 this parameter has below fields:
+
 > generationType: have two types of NUMERIC and ALPHANUMERIC
+
 > length: length of random generated string
+
 > prefix: prefix added to random generated string(empty string by default)
 
 example1: simple http request header in MDC 
@@ -129,7 +135,7 @@ servlet api in order to work with different web servers. these embedded web serv
 sample of http request and response is logged as below:
 ```
 -- Http Request --
-POST /httpserver/test
+POST /httpserver/testBodyAndRequestParam?name=mina&secretKey=*SEMI_ENCRYPTED:k
 accept: application/json, application/*+json
 content-type: application/json
 x-request-id: val453453ue
@@ -141,7 +147,7 @@ host: localhost:53454
 connection: keep-alive
 content-length: 73
 
-{"name":"mina","family":"kh","pan":"*SEMI_ENCRYPTED:403948******3094","test":"test*****"}
+{"name":"mina","family":"kh","pan":"*SEMI_ENCRYPTED:403948******3094","test":"test*****","date":"2022-08-05T12:54:01.523+00:00"}
 
 
 -- Http Response --
@@ -239,6 +245,14 @@ attention: HttpLogFilter only register http logs in DEBUG mode. and this filter 
 
 2- application/x-www-form-urlencoded
 
+masking will be applied for :
+
+>request body(in mentioned media types)
+
+>request headers
+
+>query parameters
+
 ### statistics filter
 HttpStatisticsFilter is created for purpose of logging simple metrics about http requests.
 this filter logs some metrics as below:
@@ -272,6 +286,41 @@ this aspect is for logging request and response/exception after converting http 
 changing response dto to Http response. this aspects work on each public method of any class annotated with @RequestMapping
 and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in previous sections.
 so you don't need any toString method in order to log and mask your sensitive parameters.
+format of log will be in this way:
+request:
+
+```
+{
+  "service" : "testBodyAndRequestParam",
+  "request" : {
+    "name" : "mina",
+    "secretKey" : "*SEMI_ENCRYPTED:k",
+    "dto" : {
+      "name" : "mina",
+      "family" : "kh",
+      "pan" : "*SEMI_ENCRYPTED:403948******3094",
+      "test" : "test*****",
+      "date" : "2022-08-05T17:20:40+0430"
+    }
+  }
+} 
+```
+
+response:
+```
+{
+  "service" : "testBodyAndRequestParam",
+  "duration" : "0.019s",
+  "response" : {
+    "TestResponseDto" : {
+      "secretKey" : "*SEMI_ENCRYPTED:sec",
+      "password" : "*ENCRYPTED"
+    }
+  }
+} 
+```
+
+attention: if you have any input of type HttpServletRequest, his input will be ignored in logging.
 
 ### Sample Project
 You can find a sample project in tosan-httpserver-spring-boot-sample module

@@ -46,4 +46,30 @@ public class TestController {
     public void testGetMethod() {
         System.out.println("get business here");
     }
+
+    @GetMapping(value = "/testRequestParams")
+    public void testRequestParams(@RequestParam("name") String name, @RequestParam("secretKey") String secretKey) {
+        System.out.println("request params received from request");
+    }
+
+    @PostMapping(value = "/testBodyAndRequestParam")
+    public TestResponseDto testBodyAndRequestParam(@RequestParam("name") String name,
+                                                   @RequestParam("secretKey") String secretKey,
+                                                   @RequestBody TestRequestDto dto) {
+        TestResponseDto testResponseDto = new TestResponseDto();
+        testResponseDto.setSecretKey("secret");
+        testResponseDto.setPassword("954595");
+        if (dto.getName().equals("exceptionTest")) {
+            throw new CustomException("mina test exception", "45345345");
+        }
+        return testResponseDto;
+    }
+
+    @GetMapping(value = "/noArgTest")
+    public TestResponseDto methodWithNoArgTest(HttpServletRequest request) {
+        TestResponseDto testResponseDto = new TestResponseDto();
+        testResponseDto.setSecretKey("secret");
+        testResponseDto.setPassword("954595");
+        return testResponseDto;
+    }
 }

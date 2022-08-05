@@ -75,6 +75,31 @@ public class ServerUtilITest {
                         Object.class);
     }
 
+    @Test
+    public void testRequestParams() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/testRequestParams?name=mina&secretKey=kh", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testBodyAndRequestParam() {
+        TestRequestDto dto = new TestRequestDto();
+        dto.setTest("testValue");
+        dto.setPan("4039484849393094");
+        dto.setName("mina");
+        dto.setFamily("kh");
+        dto.setDate(new Date());
+        setHeader();
+        TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
+                "/httpserver/testBodyAndRequestParam?name=mina&secretKey=kh", dto, TestResponseDto.class, new HashMap<>());
+    }
+
+    @Test
+    public void testMethodWithNoArgs() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/noArgTest", Object.class, new HashMap<>());
+    }
+
     public void setHeader() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {

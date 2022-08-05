@@ -46,7 +46,6 @@ public class HttpLogUtilUTest {
         when(response.getStatus()).thenReturn(responseStatus);
         jsonReplaceResultDto = mock(JsonReplaceResultDto.class);
         when(replaceHelperDecider.checkJsonAndReplace(any())).thenReturn(jsonReplaceResultDto);
-        when(request.getContentType()).thenReturn("application/json");
     }
 
     @Test
@@ -66,6 +65,63 @@ public class HttpLogUtilUTest {
     public void testLogRequest_WithQueryString_correctQueryStringLogging() {
         ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "name=mina&description=test";
+        when(request.getQueryString()).thenReturn(queryString);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
+        when(replaceHelperDecider.replace(eq("description"), eq("test"))).thenReturn("test");
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + queryString);
+    }
+
+    @Test
+    public void testLogRequest_WithSensitiveQueryString_correctQueryStringLogging() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        String queryString = "name=mina&description=test";
+        when(request.getQueryString()).thenReturn(queryString);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("maskedValue");
+        when(replaceHelperDecider.replace(eq("description"), eq("test"))).thenReturn("maskedVal2");
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + "name=maskedValue&description=maskedVal2");
+    }
+
+    @Test
+    public void testLogRequest_emptyQueryString_correctQueryStringLogging() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        String queryString = "";
+        when(request.getQueryString()).thenReturn(queryString);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[2], testMethod + " " + testUri + "?");
+    }
+
+    @Test
+    public void testLogRequest_oneQueryString_correctQueryStringLogging() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        String queryString = "name=mina";
+        when(request.getQueryString()).thenReturn(queryString);
+        when(request.getHeaderNames()).thenReturn(null);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + queryString);
+    }
+
+    @Test
+    public void testLogRequest_wrongFormatOfQueryString_logQueryStringWithNoChange() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        String queryString = "name=m=ina";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
@@ -265,6 +321,7 @@ public class HttpLogUtilUTest {
     @Test
     public void testLogRequest_withInvalidBody_logErrorInRequestBody() throws IOException {
         ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(request.getContentType()).thenReturn("application/json");
         when(request.getQueryString()).thenReturn(null);
         when(request.getInputStream()).thenThrow(IOException.class);
         when(request.getHeaderNames()).thenReturn(null);
