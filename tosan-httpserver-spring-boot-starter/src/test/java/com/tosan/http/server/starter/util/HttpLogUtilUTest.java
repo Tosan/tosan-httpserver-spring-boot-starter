@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.tosan.http.server.starter.TestLogUtil.getAppenderList;
@@ -244,6 +245,20 @@ public class HttpLogUtilUTest {
     }
 
     @Test
+    public void testLogRequest_withApplicationTextType_showOriginalText() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(request.getQueryString()).thenReturn(null);
+        when(inputStream.getInputByteArray()).thenReturn("test".getBytes(StandardCharsets.UTF_8));
+        when(request.getHeaderNames()).thenReturn(null);
+        when(request.getContentType()).thenReturn("text/plain");
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[4], "test");
+        verify(replaceHelperDecider, times(0)).replace(anyString());
+    }
+
+    @Test
     public void testLogRequest_withFormUrlEncodedTypeWithNullParameterMap_emptyParameters() {
         ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
@@ -450,6 +465,20 @@ public class HttpLogUtilUTest {
         String[] messageSplit = message.split("\n");
         assertEquals(messageSplit[4], maskedJson);
         verify(replaceHelperDecider, times(1)).replace(anyString());
+    }
+
+    @Test
+    public void testLogResponse_withApplicationTextType_showOriginalText() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(response.getHeaderNames()).thenReturn(null);
+        when(response.getContentAsByteArray()).thenReturn("test".getBytes(StandardCharsets.UTF_8));
+        when(response.getHeaderNames()).thenReturn(null);
+        when(response.getContentType()).thenReturn("text/plain");
+        httpLogUtil.logResponse(response);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[4], "test");
+        verify(replaceHelperDecider, times(0)).replace(anyString());
     }
 
     /*@Test

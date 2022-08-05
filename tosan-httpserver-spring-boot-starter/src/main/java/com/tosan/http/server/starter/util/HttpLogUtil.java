@@ -31,10 +31,10 @@ public class HttpLogUtil {
 
     private static final List<MediaType> VISIBLE_TYPES = Arrays.asList(
             MediaType.APPLICATION_FORM_URLENCODED,
-            MediaType.APPLICATION_JSON
-//            MediaType.valueOf("text/*"),
+            MediaType.APPLICATION_JSON,
+            MediaType.valueOf("application/*+json"),
+            MediaType.valueOf("text/*")
 //            MediaType.APPLICATION_XML,
-//            MediaType.valueOf("application/*+json"),
 //            MediaType.valueOf("application/*+xml"),
 //            MediaType.MULTIPART_FORM_DATA
     );
@@ -157,10 +157,11 @@ public class HttpLogUtil {
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
         if (visible) {
             if (mediaType.equals(MediaType.APPLICATION_JSON) || mediaMainType.equals("application/json")) {
-                extractJsonBody(request, msg);
-
+                extractBody(request, msg, true);
             } else if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED) || mediaMainType.equals("application/x-www-form-urlencoded")) {
                 extractFormBody(request, msg);
+            } else {
+                extractBody(request, msg, false);
             }
         } else {
             msg.append(String.format("unsupported media type")).append("\n");
@@ -185,11 +186,13 @@ public class HttpLogUtil {
         }
     }
 
-    private void extractJsonBody(CustomHttpServletRequestWrapper request, StringBuilder msg) throws IOException {
+    private void extractBody(CustomHttpServletRequestWrapper request, StringBuilder msg, boolean maskContent) throws IOException {
         byte[] content = request.getInputStream().getInputByteArray();
         if (content.length > 0) {
             String contentString = new String(content, StandardCharsets.UTF_8);
-            contentString = replaceHelperDecider.replace(contentString);
+            if (maskContent) {
+                contentString = replaceHelperDecider.replace(contentString);
+            }
             Stream.of(contentString.split("\r\n|\r|\n")).forEach(line -> msg.append(line).append("\n"));
         }
     }

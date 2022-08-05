@@ -72,4 +72,10 @@ public class TestController {
         testResponseDto.setPassword("954595");
         return testResponseDto;
     }
+
+    @PostMapping(value = "/text", consumes = {MediaType.TEXT_PLAIN_VALUE}, produces = {MediaType.TEXT_PLAIN_VALUE})
+    @ResponseStatus(value = HttpStatus.FOUND)
+    public String testUrlEncodedForm(String text) {
+        return "MINA kh";
+    }
 }

@@ -241,9 +241,11 @@ url patterns without default patterns.
 
 attention: HttpLogFilter only register http logs in DEBUG mode. and this filter only supports below media types:
 
-1- application/json
+1- application/*+json
 
 2- application/x-www-form-urlencoded
+
+3- text/* (with no masking)
 
 masking will be applied for :
 

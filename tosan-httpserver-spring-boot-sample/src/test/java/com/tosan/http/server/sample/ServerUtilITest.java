@@ -14,6 +14,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -98,6 +99,21 @@ public class ServerUtilITest {
     public void testMethodWithNoArgs() {
         this.restTemplate.getForObject("http://localhost:" + port +
                 "/httpserver/noArgTest", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testTextContent() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setAccept(new ArrayList<MediaType>(){{
+            add(MediaType.TEXT_PLAIN);
+        }});
+        HttpEntity<String> entity = new HttpEntity<>("input text value", headers);
+        ResponseEntity<String> response =
+                restTemplate.exchange("/httpserver/text",
+                        HttpMethod.POST,
+                        entity,
+                        String.class);
     }
 
     public void setHeader() {
