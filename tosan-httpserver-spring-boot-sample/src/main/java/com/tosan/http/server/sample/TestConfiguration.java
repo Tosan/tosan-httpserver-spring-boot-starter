@@ -13,7 +13,6 @@ import com.tosan.http.server.starter.util.MdcUtil;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.configuration.MaskBeanConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -82,7 +81,6 @@ public class TestConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     public HttpMdcFilter httpMdcFilter(MdcUtil mdcUtil) {
         HttpMdcFilter httpMdcFilter = new HttpMdcFilter(mdcUtil);
         List<String> excludeUrlPatterns = Collections.singletonList("/testUrl");

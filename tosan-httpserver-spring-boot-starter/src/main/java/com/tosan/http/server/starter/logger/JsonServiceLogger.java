@@ -1,12 +1,13 @@
 package com.tosan.http.server.starter.logger;
 
 
+import com.tosan.http.server.starter.config.ServiceLoggingConfig;
 import com.tosan.http.server.starter.util.ToStringJsonUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,6 +16,12 @@ import java.util.Objects;
  * @since 6/9/2021
  */
 public class JsonServiceLogger extends ServiceLogger {
+
+    private final ServiceLoggingConfig serviceLoggingConfig;
+
+    public JsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig) {
+        this.serviceLoggingConfig = serviceLoggingConfig;
+    }
 
     @Override
     public String getRequestLog(String serviceName, Object[] methodArgs, String[] parameterNames) {
@@ -70,8 +77,11 @@ public class JsonServiceLogger extends ServiceLogger {
     }
 
     public boolean ignoreArgument(Object object) {
-        if (object instanceof HttpServletRequest) {
-            return true;
+        List<Class<?>> classes = serviceLoggingConfig.getIgnoredParameterTypes();
+        for (Class<?> clazz : classes) {
+            if (clazz.isInstance(object)) {
+                return true;
+            }
         }
         return false;
     }

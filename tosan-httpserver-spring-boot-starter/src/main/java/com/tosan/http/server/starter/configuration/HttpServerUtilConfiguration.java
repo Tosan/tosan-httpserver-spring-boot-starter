@@ -3,6 +3,7 @@ package com.tosan.http.server.starter.configuration;
 import com.tosan.http.server.starter.aspect.ServiceLogAspect;
 import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
+import com.tosan.http.server.starter.config.ServiceLoggingConfig;
 import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
@@ -20,7 +21,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.validation.BindingResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -103,7 +106,18 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
-    public JsonServiceLogger jsonServiceLogger() {
-        return new JsonServiceLogger();
+    public JsonServiceLogger jsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig) {
+        return new JsonServiceLogger(serviceLoggingConfig);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ServiceLoggingConfig serviceLoggingConfig() {
+        ServiceLoggingConfig serviceLoggingConfig = new ServiceLoggingConfig();
+        List<Class<?>> ignoredParameterTypes = new ArrayList<>();
+        ignoredParameterTypes.add(HttpServletRequest.class);
+        ignoredParameterTypes.add(BindingResult.class);
+        serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
+        return serviceLoggingConfig;
     }
 }

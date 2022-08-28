@@ -17,6 +17,7 @@ public interface Constants {
     String X_REQUEST_ID = "X-Request-ID";
     String X_FORWARDED_FOR = "X-Forwarded-For";
     String X_USER_IP = "X-User-IP";
+    String CONTENT_LANGUAGE = "Content-Language";
 
     /**
      * constant default filter exclude patterns
