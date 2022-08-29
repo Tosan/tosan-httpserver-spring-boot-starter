@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
  * @author mina khoshnevisan
  * @since 7/25/2022
  */
-@Order(1)
+@Order(10)
 @Aspect
 public class ServiceLogAspect {
 

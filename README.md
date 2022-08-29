@@ -288,6 +288,7 @@ this aspect is for logging request and response/exception after converting http 
 changing response dto to Http response. this aspects work on each public method of any class annotated with @RequestMapping
 and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in previous sections.
 so you don't need any toString method in order to log and mask your sensitive parameters.
+this aspect has order 10, and you can consider your other business aspects around it as you prefer.
 format of log will be in this way:
 request:
 
@@ -320,6 +321,22 @@ response:
     }
   }
 } 
+```
+
+this class can ignore specified classes defined as below. you can define your own been, and it will be replaced automatically.
+
+```
+    @Bean
+    @ConditionalOnMissingBean
+    public ServiceLoggingConfig serviceLoggingConfig() {
+        ServiceLoggingConfig serviceLoggingConfig = new ServiceLoggingConfig();
+        List<Class<?>> ignoredParameterTypes = new ArrayList<>();
+        ignoredParameterTypes.add(HttpServletRequest.class);
+        ignoredParameterTypes.add(BindingResult.class);
+        serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
+        return serviceLoggingConfig;
+    }
+
 ```
 
 attention: if you have any input of type HttpServletRequest, his input will be ignored in logging.
