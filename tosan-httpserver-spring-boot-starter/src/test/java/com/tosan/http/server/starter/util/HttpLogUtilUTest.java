@@ -14,8 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.tosan.http.server.starter.TestLogUtil.getAppenderList;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -156,6 +155,82 @@ public class HttpLogUtilUTest {
         String[] messageSplit = message.split("\n");
         assertEquals(messageSplit[3], headerName + ": " + maskedValue);
         assertFalse(message.contains(sensitiveValue));
+    }
+
+    @Test
+    public void testLogRequest_withHeaderContainingUrlWithoutQueryParam_returnUnmaskedUrlAsHeader() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        Enumeration<String> headerNames = mock(Enumeration.class);
+        when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String headerName = "referer";
+        when(headerNames.nextElement()).thenReturn(headerName);
+        when(request.getHeaderNames()).thenReturn(headerNames);
+
+        Enumeration<String> headerValues = mock(Enumeration.class);
+        when(headerValues.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String urlValue = "https://192.168.107.9:8090/api/payman/PaymanReturn";
+        when(headerValues.nextElement()).thenReturn(urlValue);
+        when(request.getHeaders(anyString())).thenReturn(headerValues);
+
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[3], headerName + ": " + urlValue);
+        assertTrue(message.contains(urlValue));
+    }
+
+    @Test
+    public void testLogRequest_withHeaderContainingUrlWithUnsensitiveQueryParams_returnUnmaskedUrlAsHeader() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        Enumeration<String> headerNames = mock(Enumeration.class);
+        when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String headerName = "referer";
+        when(headerNames.nextElement()).thenReturn(headerName);
+        when(request.getHeaderNames()).thenReturn(headerNames);
+
+        Enumeration<String> headerValues = mock(Enumeration.class);
+        when(headerValues.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String urlValue = "https://192.168.107.9:8090/api/payman/PaymanReturn?name=mina";
+        when(headerValues.nextElement()).thenReturn(urlValue);
+        when(request.getHeaders(anyString())).thenReturn(headerValues);
+
+        when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
+
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(messageSplit[3], headerName + ": " + urlValue);
+        assertTrue(message.contains(urlValue));
+    }
+
+    @Test
+    public void testLogRequest_withHeaderContainingUrlWithSensitiveQueryParams_returnMaskedUrlAsHeader() {
+        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+        when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
+        Enumeration<String> headerNames = mock(Enumeration.class);
+        when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String headerName = "referer";
+        when(headerNames.nextElement()).thenReturn(headerName);
+        when(request.getHeaderNames()).thenReturn(headerNames);
+
+        Enumeration<String> headerValues = mock(Enumeration.class);
+        when(headerValues.hasMoreElements()).thenReturn(true).thenReturn(false);
+        String urlValue = "https://customer.com/api/payman/PaymanReturn?name=mina&secret=1234&family=kh";
+        when(headerValues.nextElement()).thenReturn(urlValue);
+        when(request.getHeaders(anyString())).thenReturn(headerValues);
+
+        when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
+        when(replaceHelperDecider.replace(eq("secret"), eq("1234"))).thenReturn("1**");
+        when(replaceHelperDecider.replace(eq("family"), eq("kh"))).thenReturn("kh");
+
+        httpLogUtil.logRequest(request);
+        String message = listAppender.list.get(0).getMessage();
+        String[] messageSplit = message.split("\n");
+        assertEquals(headerName + ": " + "https://customer.com/api/payman/PaymanReturn?name=mina&secret=1**&family=kh",
+                messageSplit[3]);
+        assertFalse(message.contains(urlValue));
     }
 
     @Test

@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Stream;
@@ -104,13 +106,30 @@ public class HttpLogUtil {
     }
 
     private void addHeaders(StringBuilder logMessage, String headerName, String headerValue) {
-        JsonReplaceResultDto jsonReplaceResultDto = replaceHelperDecider.checkJsonAndReplace(headerValue);
-        if (!jsonReplaceResultDto.isJson()) {
-            headerValue = replaceHelperDecider.replace(headerName, headerValue);
-        } else {
-            headerValue = jsonReplaceResultDto.getReplacedJson();
+        if (headerValue != null && headerValue.length() > 0) {
+            JsonReplaceResultDto jsonReplaceResultDto = replaceHelperDecider.checkJsonAndReplace(headerValue);
+            if (jsonReplaceResultDto.isJson()) {
+                headerValue = jsonReplaceResultDto.getReplacedJson();
+            } else if (isUrl(headerValue)) {
+                String[] urlQueryParamSplit = headerValue.split("\\?");
+                if (urlQueryParamSplit.length == 2) {
+                    String maskedQueryParams = maskQueryString(urlQueryParamSplit[1]);
+                    headerValue = urlQueryParamSplit[0] + "?" + maskedQueryParams;
+                }
+            } else {
+                headerValue = replaceHelperDecider.replace(headerName, headerValue);
+            }
         }
         logMessage.append(String.format("%s: %s", headerName, headerValue)).append("\n");
+    }
+
+    private boolean isUrl(String headerValue) {
+        try {
+            new URL(headerValue);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     private void logRequestBody(CustomHttpServletRequestWrapper request, StringBuilder requestLog) {
