@@ -17,4 +17,5 @@ public class TestRequestDto {
     private String pan;
     private String test;
     private Date date;
+    private String mobileNumber;
 }

@@ -1,81 +1,34 @@
 package com.tosan.http.server.sample;
 
-import com.tosan.http.server.sample.dto.TestRequestDto;
-import com.tosan.http.server.sample.dto.TestResponseDto;
-import com.tosan.http.server.sample.exception.CustomException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author mina khoshnevisan
- * @since 7/12/2022
+ * @since 9/20/2022
  */
-@RestController
-@RequestMapping("/httpserver")
-@Slf4j
+@Controller
+@RequestMapping("/controller/httpserver")
 public class TestController {
 
-    @PostMapping(value = "/test",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public TestResponseDto testService(@RequestBody TestRequestDto dto) {
-        TestResponseDto testResponseDto = new TestResponseDto();
-        testResponseDto.setSecretKey("secret");
-        testResponseDto.setPassword("954595");
-        if (dto.getName().equals("exceptionTest")) {
-            throw new CustomException("mina test exception", "45345345");
-        }
-        return testResponseDto;
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/error")
+    public String errorHandler(HttpServletRequest request) {
+        return "/errorPage.html";
     }
 
-    @PostMapping(value = "/confirm", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    @ResponseStatus(value = HttpStatus.FOUND)
-    public void testUrlEncodedForm(HttpServletRequest request) {
-        String parameter1 = request.getParameter("parameter1");
-        System.out.println("parameter1 = " + parameter1);
-        String parameter2 = request.getParameter("parameter2");
-        System.out.println("parameter2 = " + parameter2);
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/image")
+    public String getTestImage(HttpServletRequest request) {
+        return "/image.png";
     }
 
-    @GetMapping(value = "/testGet")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void testGetMethod() {
-        System.out.println("get business here");
-    }
-
-    @GetMapping(value = "/testRequestParams")
-    public void testRequestParams(@RequestParam("name") String name, @RequestParam("secretKey") String secretKey) {
-        System.out.println("request params received from request");
-    }
-
-    @PostMapping(value = "/testBodyAndRequestParam")
-    public TestResponseDto testBodyAndRequestParam(@RequestParam("name") String name,
-                                                   @RequestParam("secretKey") String secretKey,
-                                                   @RequestBody TestRequestDto dto) {
-        TestResponseDto testResponseDto = new TestResponseDto();
-        testResponseDto.setSecretKey("secret");
-        testResponseDto.setPassword("954595");
-        if (dto.getName().equals("exceptionTest")) {
-            throw new CustomException("mina test exception", "45345345");
-        }
-        return testResponseDto;
-    }
-
-    @GetMapping(value = "/noArgTest")
-    public TestResponseDto methodWithNoArgTest(HttpServletRequest request) {
-        TestResponseDto testResponseDto = new TestResponseDto();
-        testResponseDto.setSecretKey("secret");
-        testResponseDto.setPassword("954595");
-        return testResponseDto;
-    }
-
-    @PostMapping(value = "/text", consumes = {MediaType.TEXT_PLAIN_VALUE}, produces = {MediaType.TEXT_PLAIN_VALUE})
-    @ResponseStatus(value = HttpStatus.FOUND)
-    public String testUrlEncodedForm(String text) {
-        return "MINA kh";
+    @GetMapping(value = {"/", "/index"})
+    public ModelAndView index() {
+        ModelAndView modelAndView = new ModelAndView("/index.html");
+        return modelAndView;
     }
 }

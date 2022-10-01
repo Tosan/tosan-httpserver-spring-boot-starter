@@ -10,6 +10,7 @@ import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.util.HttpLogUtil;
 import com.tosan.http.server.starter.util.MdcUtil;
+import com.tosan.tools.mask.starter.business.enumeration.ComparisonType;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.configuration.MaskBeanConfiguration;
@@ -39,6 +40,7 @@ public class TestConfiguration {
         securedParameters.add(new SecureParameter("secretKey", UserMaskType.RIGHT));
         securedParameters.add(new SecureParameter("test", UserMaskType.TEST_MASK_TYPE));
         securedParameters.add(new SecureParameter("username", UserMaskType.SEMI));
+        securedParameters.add(new SecureParameter("mobile", UserMaskType.LEFT, ComparisonType.LEFT_LIKE));
         return new SecureParametersConfig(securedParameters);
     }
 

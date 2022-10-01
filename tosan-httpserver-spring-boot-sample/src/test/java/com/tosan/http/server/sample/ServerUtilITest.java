@@ -45,6 +45,7 @@ public class ServerUtilITest {
         dto.setName("mina");
         dto.setFamily("kh");
         dto.setDate(new Date());
+        dto.setMobileNumber("0984347384");
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
                 "/httpserver/test", dto, TestResponseDto.class, new HashMap<>());
@@ -105,7 +106,7 @@ public class ServerUtilITest {
     public void testTextContent() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
-        headers.setAccept(new ArrayList<MediaType>(){{
+        headers.setAccept(new ArrayList<MediaType>() {{
             add(MediaType.TEXT_PLAIN);
         }});
         HttpEntity<String> entity = new HttpEntity<>("input text value", headers);
@@ -114,6 +115,42 @@ public class ServerUtilITest {
                         HttpMethod.POST,
                         entity,
                         String.class);
+    }
+
+    @Test
+    public void testGenerateReport() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/generateReport", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testGenericReport() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/genericReport", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testGetDepositInformation() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/deposit/info/847483983", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testGetHttpStatusCode() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/status", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testCollectionResponseBody() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/getInfoList", Object.class, new HashMap<>());
+    }
+
+    @Test
+    public void testChangeUsername() {
+        this.restTemplate.getForObject("http://localhost:" + port +
+                "/httpserver/changeUsername", Object.class, new HashMap<>());
     }
 
     public void setHeader() {

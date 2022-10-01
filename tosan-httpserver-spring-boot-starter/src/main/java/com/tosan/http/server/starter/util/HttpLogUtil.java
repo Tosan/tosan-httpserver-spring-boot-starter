@@ -35,7 +35,8 @@ public class HttpLogUtil {
             MediaType.APPLICATION_FORM_URLENCODED,
             MediaType.APPLICATION_JSON,
             MediaType.valueOf("application/*+json"),
-            MediaType.valueOf("text/*")
+            MediaType.valueOf("text/plain"),
+            MediaType.valueOf("text/xml")
 //            MediaType.APPLICATION_XML,
 //            MediaType.valueOf("application/*+xml"),
 //            MediaType.MULTIPART_FORM_DATA

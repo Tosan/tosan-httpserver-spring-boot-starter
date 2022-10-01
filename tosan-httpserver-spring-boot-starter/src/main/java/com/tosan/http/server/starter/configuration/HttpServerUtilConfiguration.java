@@ -24,6 +24,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.validation.BindingResult;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -116,6 +117,7 @@ public class HttpServerUtilConfiguration {
         ServiceLoggingConfig serviceLoggingConfig = new ServiceLoggingConfig();
         List<Class<?>> ignoredParameterTypes = new ArrayList<>();
         ignoredParameterTypes.add(HttpServletRequest.class);
+        ignoredParameterTypes.add(HttpServletResponse.class);
         ignoredParameterTypes.add(BindingResult.class);
         serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
         return serviceLoggingConfig;

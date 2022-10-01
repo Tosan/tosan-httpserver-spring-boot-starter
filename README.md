@@ -217,6 +217,24 @@ public class TestValueMasker implements ValueMasker {
 above example mask any field with name 'test' with mask behaviour defined in UserMaskType.TEST_MASK_TYPE. some predefined 
 maskType's exist in 'tosan-mask-spring-boot-starter' like maskType (RIGHT or SEMI)
 
+you can define comparison type in each secure parameter. this feature enables you to define less parameter names based 
+on requirement. these comparison types can be selected:
+
+> EQUALS
+
+> EQUALS_IGNORE_CASE (default comparisonType)
+
+> LIKE
+
+> RIGHT_LIKE
+
+> LEFT_LIKE
+
+your required comparison type can be specified in each securedParameter as below:
+```
+   securedParameters.add(new SecureParameter("pan", UserMaskType.PAN, ComparisonType.RIGHT_LIKE));
+```
+
 for logging data a bean of type HttpLoggingFilter is provided by default as below. this bean exlude actuator url pattern
 (/actuator/*) by default.
 ```
@@ -245,7 +263,7 @@ attention: HttpLogFilter only register http logs in DEBUG mode. and this filter 
 
 2- application/x-www-form-urlencoded
 
-3- text/* (with no masking)
+3- text/plain and text/xml (with no masking)
 
 masking will be applied for :
 
@@ -332,6 +350,7 @@ this class can ignore specified classes defined as below. you can define your ow
         ServiceLoggingConfig serviceLoggingConfig = new ServiceLoggingConfig();
         List<Class<?>> ignoredParameterTypes = new ArrayList<>();
         ignoredParameterTypes.add(HttpServletRequest.class);
+        ignoredParameterTypes.add(HttpServletResponse.class);
         ignoredParameterTypes.add(BindingResult.class);
         serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
         return serviceLoggingConfig;
@@ -339,7 +358,7 @@ this class can ignore specified classes defined as below. you can define your ow
 
 ```
 
-attention: if you have any input of type HttpServletRequest, his input will be ignored in logging.
+attention: if you have any input of type HttpServletRequest, this input will be ignored in logging.
 
 ### Sample Project
 You can find a sample project in tosan-httpserver-spring-boot-sample module
