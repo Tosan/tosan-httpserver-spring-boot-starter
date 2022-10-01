@@ -18,6 +18,7 @@ import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
@@ -102,6 +103,7 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(value = "serviceLog.enabled", matchIfMissing = true)
     public ServiceLogAspect serviceLogAspect(JsonServiceLogger jsonServiceLogger) {
         return new ServiceLogAspect(jsonServiceLogger);
     }

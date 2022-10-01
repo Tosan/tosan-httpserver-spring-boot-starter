@@ -357,6 +357,10 @@ this class can ignore specified classes defined as below. you can define your ow
     }
 
 ```
+this aspect is enabled by default. in order to disable service log you can specify below property in your application.properties:
+```
+serviceLog.enabled =false
+```
 
 attention: if you have any input of type HttpServletRequest, this input will be ignored in logging.
 
