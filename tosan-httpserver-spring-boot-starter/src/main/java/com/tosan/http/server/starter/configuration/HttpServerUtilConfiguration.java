@@ -1,6 +1,7 @@
 package com.tosan.http.server.starter.configuration;
 
 import com.tosan.http.server.starter.aspect.ServiceLogAspect;
+import com.tosan.http.server.starter.aspect.StatisticsAspect;
 import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.config.ServiceLoggingConfig;
@@ -11,6 +12,7 @@ import com.tosan.http.server.starter.logger.JsonServiceLogger;
 import com.tosan.http.server.starter.util.Constants;
 import com.tosan.http.server.starter.util.HttpLogUtil;
 import com.tosan.http.server.starter.util.MdcUtil;
+import com.tosan.http.server.starter.util.StatisticsUtil;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
@@ -123,5 +125,17 @@ public class HttpServerUtilConfiguration {
         ignoredParameterTypes.add(BindingResult.class);
         serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
         return serviceLoggingConfig;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public StatisticsAspect statisticsAspect(StatisticsUtil statisticsUtil) {
+        return new StatisticsAspect(statisticsUtil);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public StatisticsUtil statisticsUtil() {
+        return new StatisticsUtil();
     }
 }

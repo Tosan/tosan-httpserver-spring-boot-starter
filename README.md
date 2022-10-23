@@ -282,7 +282,7 @@ on request:
 ```
 on response:
 ```
-{ "-service" : "POST /httpserver/test", "duration" : "3.793s", "active requests" : 0 } 
+{ "-service" : "POST /httpserver/test", "total duration" : "3.793s", "active requests" : 0 } 
 ```
 this filter excludes some url patterns by default:
 ```
@@ -299,6 +299,10 @@ you can add your desired exclude url patterns by creating HttpStatisticFilter be
         httpStatisticsFilter.addExcludeUrlPatterns(Collections.singletonList("/testUrl"));
         return httpStatisticsFilter;
     }
+```
+if you have a service that it calls some services internally ,and you need to log the statistics of these internal services you must annotate internal services method with `@Timer` and the filter logs the statistics of internal service calls like below:
+```
+ "-service" : "POST /httpserver/test", "internal service call duration" : [ { "serviceType" : "test3", "serviceName" : "test4", "duration" : 22 }], "total duration" : "23.128s", "active requests" : 0 } 
 ```
 
 ### ServiceLogAspect
