@@ -9,10 +9,7 @@ import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.logger.JsonServiceLogger;
-import com.tosan.http.server.starter.util.Constants;
-import com.tosan.http.server.starter.util.HttpLogUtil;
-import com.tosan.http.server.starter.util.MdcUtil;
-import com.tosan.http.server.starter.util.TimerStatisticsUtil;
+import com.tosan.http.server.starter.util.*;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
@@ -128,12 +125,17 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
-    public TimerStatisticsAspect statisticsAspect(TimerStatisticsUtil timerStatisticsUtil) {
-        return new TimerStatisticsAspect(timerStatisticsUtil);
+    public TimerStatisticsAspect statisticsAspect(TimerStatisticsUtil timerStatisticsUtil, AspectUtil aspectUtil) {
+        return new TimerStatisticsAspect(timerStatisticsUtil, aspectUtil);
     }
 
     @Bean
     public TimerStatisticsUtil statisticsUtil() {
         return new TimerStatisticsUtil();
+    }
+
+    @Bean
+    public AspectUtil aspectUtil() {
+        return new AspectUtil();
     }
 }

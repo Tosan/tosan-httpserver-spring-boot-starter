@@ -153,6 +153,12 @@ public class ServerUtilITest {
                 "/httpserver/changeUsername", Object.class, new HashMap<>());
     }
 
+    @Test
+    public void testInternalStatistics() {
+        this.restTemplate.getForObject("http://localhost:" + port + "/httpserver/internalStatistics",
+                Object.class, new HashMap<>());
+    }
+
     public void setHeader() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {

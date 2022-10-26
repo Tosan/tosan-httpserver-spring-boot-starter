@@ -1,6 +1,7 @@
 package com.tosan.http.server.starter.aspect;
 
 import com.tosan.http.server.starter.annotation.Timer;
+import com.tosan.http.server.starter.util.AspectUtil;
 import com.tosan.http.server.starter.util.TimerStatisticsUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -14,17 +15,19 @@ import org.springframework.core.annotation.Order;
  */
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class TimerStatisticsAspect extends BaseAspect {
+public class TimerStatisticsAspect {
 
     private final TimerStatisticsUtil timerStatisticsUtil;
+    private final AspectUtil aspectUtil;
 
-    public TimerStatisticsAspect(TimerStatisticsUtil timerStatisticsUtil) {
+    public TimerStatisticsAspect(TimerStatisticsUtil timerStatisticsUtil, AspectUtil aspectUtil) {
         this.timerStatisticsUtil = timerStatisticsUtil;
+        this.aspectUtil = aspectUtil;
     }
 
     @Around(value = "@annotation(com.tosan.http.server.starter.annotation.Timer)")
     public Object calculateStatistics(ProceedingJoinPoint pjp) throws Throwable {
-        Timer timer = getAnnotation(pjp, Timer.class);
+        Timer timer = aspectUtil.getAnnotation(pjp, Timer.class);
         long startTime = System.currentTimeMillis();
         Object result;
         try {
