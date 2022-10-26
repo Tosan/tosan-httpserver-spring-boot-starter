@@ -18,7 +18,7 @@ public @interface Timer {
     /**
      * @return service type for categorizing purpose
      */
-    String serviceType();
+    String serviceType() default "";
 
     /**
      * @return service name

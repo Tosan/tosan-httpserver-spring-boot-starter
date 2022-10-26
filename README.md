@@ -282,7 +282,7 @@ on request:
 ```
 on response:
 ```
-{ "-service" : "POST /httpserver/test", "total duration" : "3.793s", "active requests" : 0 } 
+{ "-service" : "POST /httpserver/test", "duration" : "3.793s", "active requests" : 0 } 
 ```
 this filter excludes some url patterns by default:
 ```
@@ -310,14 +310,14 @@ The below example is the service that `/httpserver/test` service call it interna
 internal service we must use `@Timer` like below:
 
 ```
-@Timer(serviceType = "test3", serviceName = "test4")
-public Object test4Service() {
+@Timer(serviceType = "InternalWebService", serviceName = "internalService")
+public void internalService() {
     ...
 }
 ```
 
 ```
-  "-service" : "POST /httpserver/test", "total duration" : "23.128s", "active requests" : 0 , "statistics" : [ "-service : test3.test4, duration :23" ] } 
+{ "-service" : "GET /httpserver/internalStatistics", "total duration" : "2.043s", "active requests" : 0, "statistics" : [ "-service : InternalWebService.internalService : 1" ] } 
 ```
 
 ### ServiceLogAspect

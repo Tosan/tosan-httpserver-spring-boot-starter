@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.tosan.http.server.starter.statistics.ServiceExecutionInfo;
 import com.tosan.http.server.starter.statistics.Statistics;
 import com.tosan.http.server.starter.util.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -85,7 +86,7 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
         final Map<String, Object> outwardLog = new LinkedHashMap<>();
         outwardLog.put("-service", serviceName);
         List<ServiceExecutionInfo> serviceExecutionInfos = Statistics.getApplicationStatistics().getServiceExecutionsInfo();
-        outwardLog.put("total duration", duration + "s");
+        outwardLog.put("duration", duration + "s");
         outwardLog.put("active requests", activeRequestsCount.decrementAndGet());
         if (!serviceExecutionInfos.isEmpty()) {
             outwardLog.put("statistics", generateStatisticsDetail(serviceExecutionInfos));
@@ -98,13 +99,12 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
         List<String> statisticsDetail = new ArrayList<>();
         for (ServiceExecutionInfo serviceExecutionInfo : serviceExecutionInfos) {
             if (serviceExecutionInfo != null) {
-                if (!serviceExecutionInfo.getServiceType().isEmpty()) {
-                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceType() + "." +
-                            serviceExecutionInfo.getServiceName() + ", duration :" + serviceExecutionInfo.getDuration());
+                if (StringUtils.isEmpty(serviceExecutionInfo.getServiceType())) {
+                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceName() + " : " +
+                            serviceExecutionInfo.getDuration() + "s");
                 } else {
-                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceName() + ", duration :" +
-                            serviceExecutionInfo.getDuration());
-
+                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceType() + "." +
+                            serviceExecutionInfo.getServiceName() + " : " + serviceExecutionInfo.getDuration() + "s");
                 }
             }
         }
