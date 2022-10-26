@@ -1,7 +1,7 @@
 package com.tosan.http.server.starter.aspect;
 
 import com.tosan.http.server.starter.annotation.Timer;
-import com.tosan.http.server.starter.util.StatisticsUtil;
+import com.tosan.http.server.starter.util.TimerStatisticsUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,12 +14,12 @@ import org.springframework.core.annotation.Order;
  */
 @Aspect
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class StatisticsAspect extends BaseAspect {
+public class TimerStatisticsAspect extends BaseAspect {
 
-    private final StatisticsUtil statisticsUtil;
+    private final TimerStatisticsUtil timerStatisticsUtil;
 
-    public StatisticsAspect(StatisticsUtil statisticsUtil) {
-        this.statisticsUtil = statisticsUtil;
+    public TimerStatisticsAspect(TimerStatisticsUtil timerStatisticsUtil) {
+        this.timerStatisticsUtil = timerStatisticsUtil;
     }
 
     @Around(value = "@annotation(com.tosan.http.server.starter.annotation.Timer)")
@@ -31,7 +31,7 @@ public class StatisticsAspect extends BaseAspect {
             result = pjp.proceed();
         } finally {
             long endTime = System.currentTimeMillis();
-            statisticsUtil.generateStatistics(timer.serviceType(), timer.serviceName(), startTime, endTime);
+            timerStatisticsUtil.generateStatistics(timer.serviceType(), timer.serviceName(), startTime, endTime);
         }
         return result;
     }

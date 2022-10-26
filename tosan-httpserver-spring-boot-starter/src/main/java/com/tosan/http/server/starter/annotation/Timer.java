@@ -3,9 +3,11 @@ package com.tosan.http.server.starter.annotation;
 import java.lang.annotation.*;
 
 /**
- * Annotation for calculate the execution statistics of internal service calls and log them
+ * Annotation for calculating the execution statistics of internal service calls
  * <br>
- * if server has a service that it calls some other services internally and the statistics of these service call are needed ,
+ * Statistics are obtained from this annotation will be logged after request completion
+ * <br>
+ * if server has a service that it calls some other services internally and the statistics of these service calls are needed ,
  * the method of these internal service call must be annotated with this annotation.
  */
 @Target(ElementType.METHOD)
@@ -14,12 +16,12 @@ import java.lang.annotation.*;
 public @interface Timer {
 
     /**
-     * @return Name of the webservice that is going to call internal service from it
+     * @return service type for categorizing purpose
      */
     String serviceType();
 
     /**
-     * @return Name of the internal service that is going to call
+     * @return service name
      */
     String serviceName();
 }

@@ -291,7 +291,9 @@ this filter excludes some url patterns by default:
 "/favicon.ico"
 "/actuator/**"
 ```
+
 you can add your desired exclude url patterns by creating HttpStatisticFilter bean like this example:
+
 ```
     @Bean
     public HttpStatisticsFilter httpStatisticsFilter() {
@@ -300,15 +302,31 @@ you can add your desired exclude url patterns by creating HttpStatisticFilter be
         return httpStatisticsFilter;
     }
 ```
-if you have a service that it calls some services internally ,and you need to log the statistics of these internal services you must annotate internal services method with `@Timer` and the filter logs the statistics of internal service calls like below:
+
+if you have a service that it calls some services internally ,and you need to log the statistics of these internal
+services you must annotate internal services method with `@Timer`.
+<br>
+The below example is the service that `/httpserver/test` service call it internally, for log the statistics of this
+internal service we must use `@Timer` like below:
+
 ```
- "-service" : "POST /httpserver/test", "internal service call duration" : [ { "serviceType" : "test3", "serviceName" : "test4", "duration" : 22 }], "total duration" : "23.128s", "active requests" : 0 } 
+@Timer(serviceType = "test3", serviceName = "test4")
+public Object test4Service() {
+    ...
+}
+```
+
+```
+  "-service" : "POST /httpserver/test", "total duration" : "23.128s", "active requests" : 0 , "statistics" : [ "-service : test3.test4, duration :23" ] } 
 ```
 
 ### ServiceLogAspect
+
 this aspect is for logging request and response/exception after converting http request to application dto and before
-changing response dto to Http response. this aspects work on each public method of any class annotated with @RequestMapping
-and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in previous sections.
+changing response dto to Http response. this aspects work on each public method of any class annotated with
+@RequestMapping
+and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in
+previous sections.
 so you don't need any toString method in order to log and mask your sensitive parameters.
 this aspect has order 10, and you can consider your other business aspects around it as you prefer.
 format of log will be in this way:

@@ -1,6 +1,6 @@
 package com.tosan.http.server.starter.configuration;
 
-import com.tosan.http.server.starter.aspect.StatisticsAspect;
+import com.tosan.http.server.starter.aspect.TimerStatisticsAspect;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
@@ -8,7 +8,7 @@ import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.util.Constants;
 import com.tosan.http.server.starter.util.HttpLogUtil;
 import com.tosan.http.server.starter.util.MdcUtil;
-import com.tosan.http.server.starter.util.StatisticsUtil;
+import com.tosan.http.server.starter.util.TimerStatisticsUtil;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.junit.jupiter.api.Test;
@@ -87,14 +87,14 @@ public class HttpServerUtilConfigurationUTest {
 
     @Test
     public void testStatisticsAspect_normalCall_createCorrectBean() {
-        StatisticsUtil statisticsUtil = new StatisticsUtil();
-        StatisticsAspect statisticsAspect = httpServerUtilConfiguration.statisticsAspect(statisticsUtil);
-        assertNotNull(statisticsAspect);
+        TimerStatisticsUtil timerStatisticsUtil = new TimerStatisticsUtil();
+        TimerStatisticsAspect timerStatisticsAspect = httpServerUtilConfiguration.statisticsAspect(timerStatisticsUtil);
+        assertNotNull(timerStatisticsAspect);
     }
 
     @Test
     public void testStatisticsUtil_normalCall_createCorrectBean() {
-        StatisticsUtil statisticsUtil = httpServerUtilConfiguration.statisticsUtil();
-        assertNotNull(statisticsUtil);
+        TimerStatisticsUtil timerStatisticsUtil = httpServerUtilConfiguration.statisticsUtil();
+        assertNotNull(timerStatisticsUtil);
     }
 }

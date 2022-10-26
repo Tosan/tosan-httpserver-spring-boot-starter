@@ -1,7 +1,7 @@
 package com.tosan.http.server.starter.configuration;
 
 import com.tosan.http.server.starter.aspect.ServiceLogAspect;
-import com.tosan.http.server.starter.aspect.StatisticsAspect;
+import com.tosan.http.server.starter.aspect.TimerStatisticsAspect;
 import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.config.ServiceLoggingConfig;
@@ -12,12 +12,12 @@ import com.tosan.http.server.starter.logger.JsonServiceLogger;
 import com.tosan.http.server.starter.util.Constants;
 import com.tosan.http.server.starter.util.HttpLogUtil;
 import com.tosan.http.server.starter.util.MdcUtil;
-import com.tosan.http.server.starter.util.StatisticsUtil;
+import com.tosan.http.server.starter.util.TimerStatisticsUtil;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
-import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
+import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -128,14 +128,12 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public StatisticsAspect statisticsAspect(StatisticsUtil statisticsUtil) {
-        return new StatisticsAspect(statisticsUtil);
+    public TimerStatisticsAspect statisticsAspect(TimerStatisticsUtil timerStatisticsUtil) {
+        return new TimerStatisticsAspect(timerStatisticsUtil);
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public StatisticsUtil statisticsUtil() {
-        return new StatisticsUtil();
+    public TimerStatisticsUtil statisticsUtil() {
+        return new TimerStatisticsUtil();
     }
 }

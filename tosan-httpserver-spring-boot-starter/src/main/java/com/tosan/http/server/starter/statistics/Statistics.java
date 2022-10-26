@@ -8,22 +8,22 @@ import java.util.List;
  * @since 10/22/2022
  */
 public class Statistics {
-    private static final ThreadLocal<Statistics> currentStatistics = new ThreadLocal<>();
+    private static final ThreadLocal<Statistics> APPLICATION_STATISTICS = new ThreadLocal<>();
     private final List<ServiceExecutionInfo> serviceExecutionsInfo;
 
     private Statistics() {
         serviceExecutionsInfo = new ArrayList<>();
     }
 
-    public static Statistics getCurrentStatistics() {
-        if (currentStatistics.get() == null) {
-            currentStatistics.set(new Statistics());
+    public static Statistics getApplicationStatistics() {
+        if (APPLICATION_STATISTICS.get() == null) {
+            APPLICATION_STATISTICS.set(new Statistics());
         }
-        return currentStatistics.get();
+        return APPLICATION_STATISTICS.get();
     }
 
     public static void cleanupSession() {
-        currentStatistics.remove();
+        APPLICATION_STATISTICS.remove();
     }
 
     public List<ServiceExecutionInfo> getServiceExecutionsInfo() {

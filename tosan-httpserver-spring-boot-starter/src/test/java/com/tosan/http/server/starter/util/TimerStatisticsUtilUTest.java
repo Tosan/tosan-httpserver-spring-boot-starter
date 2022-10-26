@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author AmirHossein ZamanZade
  * @since 10/23/2022
  */
-public class StatisticsUtilUTest {
+public class TimerStatisticsUtilUTest {
 
-    private StatisticsUtil statisticsUtil;
+    private TimerStatisticsUtil timerStatisticsUtil;
 
     @BeforeEach
     public void setup() {
-        statisticsUtil = new StatisticsUtil();
+        timerStatisticsUtil = new TimerStatisticsUtil();
     }
 
     @Test
@@ -29,8 +29,8 @@ public class StatisticsUtilUTest {
         String serviceName = "statistics";
         long startTime = System.currentTimeMillis();
         long endTime = startTime + 1000;
-        statisticsUtil.generateStatistics(serviceType, serviceName, startTime, endTime);
-        List<ServiceExecutionInfo> serviceExecutionInfos = Statistics.getCurrentStatistics().getServiceExecutionsInfo();
+        timerStatisticsUtil.generateStatistics(serviceType, serviceName, startTime, endTime);
+        List<ServiceExecutionInfo> serviceExecutionInfos = Statistics.getApplicationStatistics().getServiceExecutionsInfo();
         assertNotNull(serviceExecutionInfos);
         ServiceExecutionInfo serviceExecutionInfo = serviceExecutionInfos.get(0);
         assertNotNull(serviceExecutionInfo);
@@ -38,4 +38,5 @@ public class StatisticsUtilUTest {
         assertEquals(serviceExecutionInfo.getServiceName(), serviceName);
         assertEquals(serviceExecutionInfo.getDuration(), (endTime - startTime) / 1000);
     }
+
 }
