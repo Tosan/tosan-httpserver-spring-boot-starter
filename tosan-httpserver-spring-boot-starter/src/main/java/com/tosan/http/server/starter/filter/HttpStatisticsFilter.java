@@ -7,7 +7,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.tosan.http.server.starter.statistics.ServiceExecutionInfo;
+import com.tosan.http.server.starter.statistics.Statistics;
 import com.tosan.http.server.starter.util.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -19,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -81,9 +85,30 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
         double duration = (System.currentTimeMillis() - startTime) / 1000.0;
         final Map<String, Object> outwardLog = new LinkedHashMap<>();
         outwardLog.put("-service", serviceName);
+        List<ServiceExecutionInfo> serviceExecutionInfos = Statistics.getApplicationStatistics().getServiceExecutionsInfo();
         outwardLog.put("duration", duration + "s");
         outwardLog.put("active requests", activeRequestsCount.decrementAndGet());
+        if (!serviceExecutionInfos.isEmpty()) {
+            outwardLog.put("statistics", generateStatisticsDetail(serviceExecutionInfos));
+        }
         LOGGER.info(writeJson(outwardLog));
+        Statistics.cleanupSession();
+    }
+
+    private List<String> generateStatisticsDetail(List<ServiceExecutionInfo> serviceExecutionInfos) {
+        List<String> statisticsDetail = new ArrayList<>();
+        for (ServiceExecutionInfo serviceExecutionInfo : serviceExecutionInfos) {
+            if (serviceExecutionInfo != null) {
+                if (StringUtils.isEmpty(serviceExecutionInfo.getServiceType())) {
+                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceName() + " : " +
+                            serviceExecutionInfo.getDuration() + "s");
+                } else {
+                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceType() + "." +
+                            serviceExecutionInfo.getServiceName() + " : " + serviceExecutionInfo.getDuration() + "s");
+                }
+            }
+        }
+        return statisticsDetail;
     }
 
     protected static String writeJson(Object object) {

@@ -291,7 +291,9 @@ this filter excludes some url patterns by default:
 "/favicon.ico"
 "/actuator/**"
 ```
+
 you can add your desired exclude url patterns by creating HttpStatisticFilter bean like this example:
+
 ```
     @Bean
     public HttpStatisticsFilter httpStatisticsFilter() {
@@ -301,10 +303,30 @@ you can add your desired exclude url patterns by creating HttpStatisticFilter be
     }
 ```
 
+if you have a service that it calls some services internally ,and you need to log the statistics of these internal
+services you must annotate internal services method with `@Timer`.
+<br>
+The below example is the service that `/httpserver/test` service call it internally, for log the statistics of this
+internal service we must use `@Timer` like below:
+
+```
+@Timer(serviceType = "InternalWebService", serviceName = "internalService")
+public void internalService() {
+    ...
+}
+```
+
+```
+{ "-service" : "GET /httpserver/internalStatistics", "total duration" : "2.043s", "active requests" : 0, "statistics" : [ "-service : InternalWebService.internalService : 1" ] } 
+```
+
 ### ServiceLogAspect
+
 this aspect is for logging request and response/exception after converting http request to application dto and before
-changing response dto to Http response. this aspects work on each public method of any class annotated with @RequestMapping
-and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in previous sections.
+changing response dto to Http response. this aspects work on each public method of any class annotated with
+@RequestMapping
+and run in INFO log mode. this aspect uses jackson library for logging and consider all mask type mappings defined in
+previous sections.
 so you don't need any toString method in order to log and mask your sensitive parameters.
 this aspect has order 10, and you can consider your other business aspects around it as you prefer.
 format of log will be in this way:

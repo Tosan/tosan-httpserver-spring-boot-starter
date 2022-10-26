@@ -1,12 +1,11 @@
 package com.tosan.http.server.starter.configuration;
 
+import com.tosan.http.server.starter.aspect.TimerStatisticsAspect;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
-import com.tosan.http.server.starter.util.Constants;
-import com.tosan.http.server.starter.util.HttpLogUtil;
-import com.tosan.http.server.starter.util.MdcUtil;
+import com.tosan.http.server.starter.util.*;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.junit.jupiter.api.Test;
@@ -81,5 +80,25 @@ public class HttpServerUtilConfigurationUTest {
         MdcFilterConfig mdcFilterConfig = httpServerUtilConfiguration.mdcFilterConfig();
         assertNotNull(mdcFilterConfig);
         assertEquals(Constants.X_REQUEST_ID_MDC_PARAM, mdcFilterConfig.getParameters().get(0));
+    }
+
+    @Test
+    public void testStatisticsAspect_normalCall_createCorrectBean() {
+        TimerStatisticsUtil timerStatisticsUtil = new TimerStatisticsUtil();
+        AspectUtil aspectUtil = new AspectUtil();
+        TimerStatisticsAspect timerStatisticsAspect = httpServerUtilConfiguration.statisticsAspect(timerStatisticsUtil, aspectUtil);
+        assertNotNull(timerStatisticsAspect);
+    }
+
+    @Test
+    public void testStatisticsUtil_normalCall_createCorrectBean() {
+        TimerStatisticsUtil timerStatisticsUtil = httpServerUtilConfiguration.statisticsUtil();
+        assertNotNull(timerStatisticsUtil);
+    }
+
+    @Test
+    public void testAspectUtil_normalCall_createCorrectBean() {
+        AspectUtil aspectUtil = httpServerUtilConfiguration.aspectUtil();
+        assertNotNull(aspectUtil);
     }
 }

@@ -1,6 +1,7 @@
 package com.tosan.http.server.starter.configuration;
 
 import com.tosan.http.server.starter.aspect.ServiceLogAspect;
+import com.tosan.http.server.starter.aspect.TimerStatisticsAspect;
 import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.config.ServiceLoggingConfig;
@@ -8,14 +9,12 @@ import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.logger.JsonServiceLogger;
-import com.tosan.http.server.starter.util.Constants;
-import com.tosan.http.server.starter.util.HttpLogUtil;
-import com.tosan.http.server.starter.util.MdcUtil;
+import com.tosan.http.server.starter.util.*;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
-import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
+import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -123,5 +122,20 @@ public class HttpServerUtilConfiguration {
         ignoredParameterTypes.add(BindingResult.class);
         serviceLoggingConfig.setIgnoredParameterTypes(ignoredParameterTypes);
         return serviceLoggingConfig;
+    }
+
+    @Bean
+    public TimerStatisticsAspect statisticsAspect(TimerStatisticsUtil timerStatisticsUtil, AspectUtil aspectUtil) {
+        return new TimerStatisticsAspect(timerStatisticsUtil, aspectUtil);
+    }
+
+    @Bean
+    public TimerStatisticsUtil statisticsUtil() {
+        return new TimerStatisticsUtil();
+    }
+
+    @Bean
+    public AspectUtil aspectUtil() {
+        return new AspectUtil();
     }
 }

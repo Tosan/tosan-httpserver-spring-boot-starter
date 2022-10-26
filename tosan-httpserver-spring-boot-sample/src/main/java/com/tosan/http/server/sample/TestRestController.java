@@ -4,6 +4,7 @@ import com.tosan.http.server.sample.dto.ResultSetModel;
 import com.tosan.http.server.sample.dto.TestRequestDto;
 import com.tosan.http.server.sample.dto.TestResponseDto;
 import com.tosan.http.server.sample.exception.CustomException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +22,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/httpserver")
 @Slf4j
+@RequiredArgsConstructor
 public class TestRestController {
+
+    private final InternalWebService internalWebService;
 
     @PostMapping(value = "/test",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -122,7 +126,18 @@ public class TestRestController {
     }
 
     @GetMapping(value = "/changeUsername")
+    @ResponseStatus(value = HttpStatus.OK)
     public boolean changeUserName() {
         return false;
+    }
+
+    @GetMapping("/internalStatistics")
+    public void internalStatistics() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        internalWebService.internalService();
     }
 }
