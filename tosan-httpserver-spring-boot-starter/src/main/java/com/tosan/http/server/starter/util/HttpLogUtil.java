@@ -26,9 +26,11 @@ public class HttpLogUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpLogUtil.class);
 
     private final JsonReplaceHelperDecider replaceHelperDecider;
+    private final LogContentProvider logContentProvider;
 
-    public HttpLogUtil(JsonReplaceHelperDecider replaceHelperDecider) {
+    public HttpLogUtil(JsonReplaceHelperDecider replaceHelperDecider, LogContentProvider logContentProvider) {
         this.replaceHelperDecider = replaceHelperDecider;
+        this.logContentProvider = logContentProvider;
     }
 
     private static final List<MediaType> VISIBLE_TYPES = Arrays.asList(
@@ -43,36 +45,32 @@ public class HttpLogUtil {
     );
 
     public void logRequest(CustomHttpServletRequestWrapper request) {
-        Map<String, Object> requestLogMap = new LinkedHashMap<>(1);
-        Map<String, Object> objectMap = new LinkedHashMap<>();
-        logRequestHeader(request, objectMap);
-        logRequestBody(request, objectMap);
-        requestLogMap.put("Http Request", objectMap);
-        LOGGER.debug(ToStringJsonUtil.toJson(requestLogMap));
+        Object logContainer = logContentProvider.getContentContainer();
+        logRequestHeader(request, logContentProvider, logContainer);
+        logRequestBody(request, logContentProvider, logContainer);
+        LOGGER.debug(logContentProvider.generateLogContent("Http Request", logContainer));
     }
 
     public void logResponse(ContentCachingResponseWrapper response) {
-        Map<String, Object> responseLogMap = new LinkedHashMap<>(1);
-        Map<String, Object> objectMap = new LinkedHashMap<>();
-        logResponseHeaders(response, objectMap);
-        logResponseBody(response, objectMap);
-        responseLogMap.put("Http Response", objectMap);
-        LOGGER.debug(ToStringJsonUtil.toJson(responseLogMap));
+        Object logContainer = logContentProvider.getContentContainer();
+        logResponseHeaders(response, logContentProvider, logContainer);
+        logResponseBody(response, logContentProvider, logContainer);
+        LOGGER.debug(logContentProvider.generateLogContent("Http Response", logContainer));
     }
 
-    private void logRequestHeader(CustomHttpServletRequestWrapper request, Map<String, Object> objectMap) {
+    private void logRequestHeader(CustomHttpServletRequestWrapper request, LogContentProvider logContentProvider, Object logContainer) {
         String queryString = request.getQueryString();
         if (queryString == null) {
-            objectMap.put("service", String.format("%s %s", request.getMethod(), request.getRequestURI()));
+            logContentProvider.addToContent("service", String.format("%s %s", request.getMethod(), request.getRequestURI()), logContainer);
         } else {
             String maskedQueryString = maskQueryString(queryString);
-            objectMap.put("service", String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), maskedQueryString));
+            logContentProvider.addToContent("service", String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), maskedQueryString), logContainer);
         }
         final Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
             Collections.list(headerNames).forEach(headerName ->
                     Collections.list(request.getHeaders(headerName))
-                            .forEach(headerValue -> addHeaders(objectMap, headerName, headerValue)));
+                            .forEach(headerValue -> addHeaders(logContentProvider, logContainer, headerName, headerValue)));
         }
     }
 
@@ -96,18 +94,18 @@ public class HttpLogUtil {
         return result.toString();
     }
 
-    private void logResponseHeaders(ContentCachingResponseWrapper response, Map<String, Object> objectMap) {
+    private void logResponseHeaders(ContentCachingResponseWrapper response, LogContentProvider logContentProvider, Object logContainer) {
         int status = response.getStatus();
-        objectMap.put("status", String.format("%s %s", status, HttpStatus.valueOf(status).getReasonPhrase()));
+        logContentProvider.addToContent("status", String.format("%s %s", status, HttpStatus.valueOf(status).getReasonPhrase()), logContainer);
         Collection<String> headerNames = response.getHeaderNames();
         if (headerNames != null) {
             headerNames.forEach(headerName ->
                     response.getHeaders(headerName)
-                            .forEach(headerValue -> addHeaders(objectMap, headerName, headerValue)));
+                            .forEach(headerValue -> addHeaders(logContentProvider, logContainer, headerName, headerValue)));
         }
     }
 
-    private void addHeaders(Map<String, Object> objectMap, String headerName, String headerValue) {
+    private void addHeaders(LogContentProvider logContentProvider, Object logContainer, String headerName, String headerValue) {
         if (headerValue != null && headerValue.length() > 0) {
             JsonReplaceResultDto jsonReplaceResultDto = replaceHelperDecider.checkJsonAndReplace(headerValue);
             if (jsonReplaceResultDto.isJson()) {
@@ -122,7 +120,7 @@ public class HttpLogUtil {
                 headerValue = replaceHelperDecider.replace(headerName, headerValue);
             }
         }
-        objectMap.put(headerName, headerValue);
+        logContentProvider.addToContent(headerName, headerValue, logContainer);
     }
 
     private boolean isUrl(String headerValue) {
@@ -134,22 +132,22 @@ public class HttpLogUtil {
         }
     }
 
-    private void logRequestBody(CustomHttpServletRequestWrapper request, Map<String, Object> objectMap) {
+    private void logRequestBody(CustomHttpServletRequestWrapper request, LogContentProvider logContentProvider, Object logContainer) {
         try {
-            logRequestContent(request, objectMap);
+            logRequestContent(request, logContentProvider, logContainer);
         } catch (IOException e) {
-            objectMap.put("error in request body reading", e.getMessage());
+            logContentProvider.addToContent("error in request body reading", e.getMessage(), logContainer);
         }
     }
 
-    private void logResponseBody(ContentCachingResponseWrapper response, Map<String, Object> objectMap) {
+    private void logResponseBody(ContentCachingResponseWrapper response, LogContentProvider logContentProvider, Object logContainer) {
         byte[] content = response.getContentAsByteArray();
         if (content.length > 0) {
-            logContent(content, response.getContentType(), objectMap);
+            logContent(content, response.getContentType(), logContentProvider, logContainer);
         }
     }
 
-    private void logContent(byte[] content, String contentType, Map<String, Object> objectMap) {
+    private void logContent(byte[] content, String contentType, LogContentProvider logContentProvider, Object logContainer) {
         if (StringUtils.isEmpty(contentType)) {
             return;
         }
@@ -163,13 +161,13 @@ public class HttpLogUtil {
                 contentString = replaceHelperDecider.replace(contentString);
             }
             Stream.of(contentString.split("\r\n|\r|\n")).forEach(msg::append);
-            objectMap.put("body", msg);
+            logContentProvider.addToContent("body", msg, logContainer);
         } else {
-            objectMap.put("content bytes", content.length);
+            logContentProvider.addToContent("content bytes", content.length, logContainer);
         }
     }
 
-    private void logRequestContent(CustomHttpServletRequestWrapper request, Map<String, Object> objectMap) throws IOException {
+    private void logRequestContent(CustomHttpServletRequestWrapper request, LogContentProvider logContentProvider, Object logContainer) throws IOException {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
             return;
@@ -179,21 +177,22 @@ public class HttpLogUtil {
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
         if (visible) {
             if (mediaType.equals(MediaType.APPLICATION_JSON) || mediaMainType.equals("application/json")) {
-                extractBody(request, objectMap, true);
+                extractBody(request, logContentProvider, logContainer, true);
             } else if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED) || mediaMainType.equals("application/x-www-form-urlencoded")) {
-                extractFormBody(request, objectMap);
+                extractFormBody(request, logContentProvider, logContainer);
             } else {
-                extractBody(request, objectMap, false);
+                extractBody(request, logContentProvider, logContainer, false);
             }
         } else {
-            objectMap.put("unsupported media type", mediaType);
+            logContentProvider.addToContent("unsupported media type", mediaType, logContainer);
         }
     }
 
-    private void extractFormBody(CustomHttpServletRequestWrapper request, Map<String, Object> objectMap) {
+    private void extractFormBody(CustomHttpServletRequestWrapper request, LogContentProvider logContentProvider, Object logContainer) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         StringBuilder msg = new StringBuilder();
         if (parameterMap != null) {
+            msg.append("\n");
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
                 msg.append(entry.getKey()).append(" : ");
                 if (entry.getValue() != null && entry.getValue().length > 0) {
@@ -206,10 +205,10 @@ public class HttpLogUtil {
                 msg.append("\n");
             }
         }
-        objectMap.put("form parameters", msg.toString());
+        logContentProvider.addToContent("form parameters", msg.toString(), logContainer);
     }
 
-    private void extractBody(CustomHttpServletRequestWrapper request, Map<String, Object> objectMap, boolean maskContent) throws IOException {
+    private void extractBody(CustomHttpServletRequestWrapper request, LogContentProvider logContentProvider, Object logContainer, boolean maskContent) throws IOException {
         byte[] content = request.getInputStream().getInputByteArray();
         if (content.length > 0) {
             StringBuilder msg = new StringBuilder();
@@ -218,7 +217,7 @@ public class HttpLogUtil {
                 contentString = replaceHelperDecider.replace(contentString);
             }
             Stream.of(contentString.split("\r\n|\r|\n")).forEach(msg::append);
-            objectMap.put("body", msg.toString());
+            logContentProvider.addToContent("body", msg.toString(), logContainer);
         }
     }
 }
