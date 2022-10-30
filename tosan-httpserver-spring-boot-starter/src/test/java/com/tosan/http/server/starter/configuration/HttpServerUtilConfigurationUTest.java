@@ -56,7 +56,7 @@ public class HttpServerUtilConfigurationUTest {
 
     @Test
     public void testHttpLogUtil_normalCall_createBeanCorrectly() {
-        HttpLogUtil httpLogUtil = httpServerUtilConfiguration.httpLogUtil(null);
+        HttpLogUtil httpLogUtil = httpServerUtilConfiguration.httpLogUtil(null, null);
         assertNotNull(httpLogUtil);
     }
 
