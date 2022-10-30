@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.inject.Provider;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -48,8 +47,6 @@ public class HttpLogUtilUTest {
         when(response.getStatus()).thenReturn(responseStatus);
         jsonReplaceResultDto = mock(JsonReplaceResultDto.class);
         when(replaceHelperDecider.checkJsonAndReplace(any())).thenReturn(jsonReplaceResultDto);
-        Provider logContentProvider = mock(Provider.class);
-        when(logContentProvider.get()).thenReturn(new HttpLogContentProvider());
     }
 
     @Test
@@ -62,7 +59,7 @@ public class HttpLogUtilUTest {
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
         assertEquals("-- Http Request --", messageSplit[1]);
-        assertEquals("service: " + testMethod + " " + testUri, messageSplit[2]);
+        assertEquals(testMethod + " " + testUri, messageSplit[2]);
     }
 
     @Test
@@ -77,7 +74,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("service: " + testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
+        assertEquals(testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
     }
 
     @Test
@@ -92,7 +89,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("service: " + testMethod + " " + testUri + "?" + "name=maskedValue&description=maskedVal2", messageSplit[2]);
+        assertEquals(testMethod + " " + testUri + "?" + "name=maskedValue&description=maskedVal2", messageSplit[2]);
     }
 
     @Test
@@ -105,7 +102,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("service: " + testMethod + " " + testUri + "?", messageSplit[2]);
+        assertEquals(testMethod + " " + testUri + "?", messageSplit[2]);
     }
 
     @Test
@@ -119,7 +116,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("service: " + testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
+        assertEquals(testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
     }
 
     @Test
@@ -132,7 +129,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("service: " + testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
+        assertEquals(testMethod + " " + testUri + "?" + queryString, messageSplit[2]);
     }
 
     @Test
@@ -319,7 +316,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("body: " + maskedJson, messageSplit[3]);
+        assertEquals(maskedJson, messageSplit[3]);
         verify(replaceHelperDecider, times(1)).replace(anyString());
     }
 
@@ -333,7 +330,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logRequest(request);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("body: test", messageSplit[3]);
+        assertEquals("test", messageSplit[3]);
         verify(replaceHelperDecider, times(0)).replace(anyString());
     }
 
@@ -434,7 +431,7 @@ public class HttpLogUtilUTest {
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
         assertEquals("-- Http Response --", messageSplit[1]);
-        assertEquals("status: " + responseStatus + " OK", messageSplit[2]);
+        assertEquals(responseStatus + " OK", messageSplit[2]);
     }
 
     @Test
@@ -542,7 +539,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logResponse(response);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("body: " + maskedJson, messageSplit[3]);
+        assertEquals(maskedJson, messageSplit[3]);
         verify(replaceHelperDecider, times(1)).replace(anyString());
     }
 
@@ -556,7 +553,7 @@ public class HttpLogUtilUTest {
         httpLogUtil.logResponse(response);
         String message = listAppender.list.get(0).getMessage();
         String[] messageSplit = message.split("\n");
-        assertEquals("body: test", messageSplit[3]);
+        assertEquals("test", messageSplit[3]);
         verify(replaceHelperDecider, times(0)).replace(anyString());
     }
 

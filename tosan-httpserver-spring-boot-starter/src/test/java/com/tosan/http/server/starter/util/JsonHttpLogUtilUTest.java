@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.inject.Provider;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -50,9 +49,6 @@ public class JsonHttpLogUtilUTest {
         jsonReplaceResultDto = mock(JsonReplaceResultDto.class);
         when(replaceHelperDecider.checkJsonAndReplace(any())).thenReturn(jsonReplaceResultDto);
         StaticJsonReplaceHelperDecider.init(replaceHelperDecider);
-        Provider logContentProvider = mock(Provider.class);
-        when(logContentProvider.get()).thenReturn(new JsonHttpLogContentProvider());
-
     }
 
     @Test
@@ -678,6 +674,7 @@ public class JsonHttpLogUtilUTest {
         when(response.getContentType()).thenReturn("application/json");
         String maskedJson = "maskedJson";
         when(replaceHelperDecider.replace(anyString())).thenReturn(maskedJson);
+        when(replaceHelperDecider.replace(eq("body"), eq(maskedJson))).thenReturn(maskedJson);
         httpLogUtil.logResponse(response);
         String message = listAppender.list.get(0).getMessage();
         assertEquals(expectedJson, message, false);
@@ -696,6 +693,7 @@ public class JsonHttpLogUtilUTest {
         when(response.getContentAsByteArray()).thenReturn("test".getBytes(StandardCharsets.UTF_8));
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentType()).thenReturn("text/plain");
+        when(replaceHelperDecider.replace(eq("body"), eq("test"))).thenReturn("test");
         httpLogUtil.logResponse(response);
         String message = listAppender.list.get(0).getMessage();
         assertEquals(expectedJson, message, false);

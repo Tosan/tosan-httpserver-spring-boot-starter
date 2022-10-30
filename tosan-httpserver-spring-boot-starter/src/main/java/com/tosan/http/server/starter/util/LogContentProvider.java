@@ -1,14 +1,25 @@
 package com.tosan.http.server.starter.util;
 
+import com.tosan.http.server.starter.wrapper.LogContentContainer;
+
 /**
  * @author AmirHossein ZamanZade
  * @since 10/29/2022
  */
-public abstract class LogContentProvider<T> {
+public abstract class LogContentProvider {
+    public String generateLogContent(LogContentContainer container) {
+        if (container != null && container.getTitle() != null) {
+            switch (container.getTitle()) {
+                case REQUEST:
+                    return generateRequestLogContent(container);
+                case RESPONSE:
+                    return generateResponseLogContent(container);
+            }
+        }
+        return null;
+    }
 
-    public abstract T getContentContainer();
+    protected abstract String generateRequestLogContent(LogContentContainer container);
 
-    public abstract void addToContent(String key, Object value, T container);
-
-    public abstract String generateLogContent(String key, T container);
+    protected abstract String generateResponseLogContent(LogContentContainer container);
 }
