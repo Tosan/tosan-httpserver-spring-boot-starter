@@ -158,7 +158,7 @@ content-length: 73
 
 ### http log format
 
-format of http log can be defined by `http.log.format` config , this config accept 2 value : `raw, json`.
+format of http log can be defined by `http.log.format` config , this config accept one of these values : `raw, json`
 <br>NOTE: The default format is `raw`.
 <br>to customize the format of http log you must implement `LogContentProvider`.
 <br>sample of customizing http log format:

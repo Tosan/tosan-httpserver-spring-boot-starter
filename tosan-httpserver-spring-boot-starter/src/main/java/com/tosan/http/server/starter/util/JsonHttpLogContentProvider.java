@@ -67,7 +67,7 @@ public class JsonHttpLogContentProvider extends LogContentProvider {
     }
 
     private void addBody(LogContentContainer container, Map<String, Object> objectMap) {
-        if (!StringUtils.isEmpty(container.getBody())) {
+        if (StringUtils.isNotEmpty(container.getBody())) {
             objectMap.put("body", container.getBody());
         }
     }
