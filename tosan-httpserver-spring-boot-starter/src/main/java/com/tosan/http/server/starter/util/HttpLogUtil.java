@@ -1,6 +1,8 @@
 package com.tosan.http.server.starter.util;
 
 import com.tosan.http.server.starter.wrapper.CustomHttpServletRequestWrapper;
+import com.tosan.http.server.starter.wrapper.HttpTitleType;
+import com.tosan.http.server.starter.wrapper.LogContentContainer;
 import com.tosan.tools.mask.starter.dto.JsonReplaceResultDto;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +28,11 @@ public class HttpLogUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpLogUtil.class);
 
     private final JsonReplaceHelperDecider replaceHelperDecider;
+    private final LogContentProvider logContentProvider;
 
-    public HttpLogUtil(JsonReplaceHelperDecider replaceHelperDecider) {
+    public HttpLogUtil(JsonReplaceHelperDecider replaceHelperDecider, LogContentProvider logContentProvider) {
         this.replaceHelperDecider = replaceHelperDecider;
+        this.logContentProvider = logContentProvider;
     }
 
     private static final List<MediaType> VISIBLE_TYPES = Arrays.asList(
@@ -43,36 +47,35 @@ public class HttpLogUtil {
     );
 
     public void logRequest(CustomHttpServletRequestWrapper request) {
-        StringBuilder requestLog = new StringBuilder();
-        requestLog.append("\n-- Http Request --\n");
-        logRequestHeader(request, requestLog);
-        logRequestBody(request, requestLog);
-        LOGGER.debug(requestLog.toString());
+        LogContentContainer container = new LogContentContainer();
+        container.setTitle(HttpTitleType.REQUEST);
+        logRequestHeader(request, container);
+        logRequestBody(request, container);
+        LOGGER.debug(logContentProvider.generateLogContent(container));
     }
 
     public void logResponse(ContentCachingResponseWrapper response) {
-        StringBuilder responseLog = new StringBuilder();
-        responseLog.append("\n-- Http Response --\n");
-        logResponseHeaders(response, responseLog);
-        logResponseBody(response, responseLog);
-        LOGGER.debug(responseLog.toString());
+        LogContentContainer container = new LogContentContainer();
+        container.setTitle(HttpTitleType.RESPONSE);
+        logResponseHeaders(response, container);
+        logResponseBody(response, container);
+        LOGGER.debug(logContentProvider.generateLogContent(container));
     }
 
-    private void logRequestHeader(CustomHttpServletRequestWrapper request, StringBuilder requestLog) {
+    private void logRequestHeader(CustomHttpServletRequestWrapper request, LogContentContainer container) {
         String queryString = request.getQueryString();
         if (queryString == null) {
-            requestLog.append(String.format("%s %s", request.getMethod(), request.getRequestURI())).append("\n");
+            container.setUrl(String.format("%s %s", request.getMethod(), request.getRequestURI()));
         } else {
             String maskedQueryString = maskQueryString(queryString);
-            requestLog.append(String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), maskedQueryString)).append("\n");
+            container.setUrl(String.format("%s %s?%s", request.getMethod(), request.getRequestURI(), maskedQueryString));
         }
         final Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
             Collections.list(headerNames).forEach(headerName ->
                     Collections.list(request.getHeaders(headerName))
-                            .forEach(headerValue -> addHeaders(requestLog, headerName, headerValue)));
+                            .forEach(headerValue -> addHeaders(headerName, headerValue, container)));
         }
-        requestLog.append("\n");
     }
 
     private String maskQueryString(String queryString) {
@@ -85,7 +88,7 @@ public class HttpLogUtil {
             String[] fieldValueSplit = queryParam.split("=");
             if (fieldValueSplit.length == 2) {
                 String maskedValue = replaceHelperDecider.replace(fieldValueSplit[0], fieldValueSplit[1]);
-                result.append(fieldValueSplit[0] + "=" + maskedValue);
+                result.append(fieldValueSplit[0]).append("=").append(maskedValue);
             } else {
                 result.append(queryParam);
             }
@@ -95,18 +98,18 @@ public class HttpLogUtil {
         return result.toString();
     }
 
-    private void logResponseHeaders(ContentCachingResponseWrapper response, StringBuilder responseLog) {
+    private void logResponseHeaders(ContentCachingResponseWrapper response, LogContentContainer container) {
         int status = response.getStatus();
-        responseLog.append(String.format("%s %s", status, HttpStatus.valueOf(status).getReasonPhrase())).append("\n");
+        container.setStatus(String.format("%s %s", status, HttpStatus.valueOf(status).getReasonPhrase()));
         Collection<String> headerNames = response.getHeaderNames();
         if (headerNames != null) {
             headerNames.forEach(headerName ->
                     response.getHeaders(headerName)
-                            .forEach(headerValue -> addHeaders(responseLog, headerName, headerValue)));
+                            .forEach(headerValue -> addHeaders(headerName, headerValue, container)));
         }
     }
 
-    private void addHeaders(StringBuilder logMessage, String headerName, String headerValue) {
+    private void addHeaders(String headerName, String headerValue, LogContentContainer container) {
         if (headerValue != null && headerValue.length() > 0) {
             JsonReplaceResultDto jsonReplaceResultDto = replaceHelperDecider.checkJsonAndReplace(headerValue);
             if (jsonReplaceResultDto.isJson()) {
@@ -121,7 +124,7 @@ public class HttpLogUtil {
                 headerValue = replaceHelperDecider.replace(headerName, headerValue);
             }
         }
-        logMessage.append(String.format("%s: %s", headerName, headerValue)).append("\n");
+        container.getHeaders().put(headerName, headerValue);
     }
 
     private boolean isUrl(String headerValue) {
@@ -133,26 +136,27 @@ public class HttpLogUtil {
         }
     }
 
-    private void logRequestBody(CustomHttpServletRequestWrapper request, StringBuilder requestLog) {
+    private void logRequestBody(CustomHttpServletRequestWrapper request, LogContentContainer container) {
         try {
-            logRequestContent(request, requestLog);
+            logRequestContent(request, container);
         } catch (IOException e) {
-            requestLog.append(String.format("[error in request body reading : %s]", e.getMessage())).append("\n");
+            container.setHasErrorInBodyRendering(true);
+            container.getErrorParam().put("error in request body reading", e.getMessage());
         }
     }
 
-    private void logResponseBody(ContentCachingResponseWrapper response, StringBuilder responseLog) {
-        responseLog.append("\n");
+    private void logResponseBody(ContentCachingResponseWrapper response, LogContentContainer container) {
         byte[] content = response.getContentAsByteArray();
         if (content.length > 0) {
-            logContent(content, response.getContentType(), responseLog);
+            logContent(content, response.getContentType(), container);
         }
     }
 
-    private void logContent(byte[] content, String contentType, StringBuilder msg) {
+    private void logContent(byte[] content, String contentType, LogContentContainer container) {
         if (StringUtils.isEmpty(contentType)) {
             return;
         }
+        StringBuilder msg = new StringBuilder();
         MediaType mediaType = MediaType.valueOf(contentType);
         boolean visible = VISIBLE_TYPES.stream().anyMatch(visibleType -> visibleType.includes(mediaType));
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
@@ -161,13 +165,15 @@ public class HttpLogUtil {
             if (mediaType.equals(MediaType.APPLICATION_JSON) || mediaMainType.equals("application/json")) {
                 contentString = replaceHelperDecider.replace(contentString);
             }
-            Stream.of(contentString.split("\r\n|\r|\n")).forEach(line -> msg.append(line).append("\n"));
+            Stream.of(contentString.split("\r\n|\r|\n")).forEach(msg::append);
+            container.setBody(msg.toString());
         } else {
-            msg.append(String.format("[%d bytes content]", content.length)).append("\n");
+            container.setHasErrorInBodyRendering(true);
+            container.getErrorParam().put("content bytes", content.length);
         }
     }
 
-    private void logRequestContent(CustomHttpServletRequestWrapper request, StringBuilder msg) throws IOException {
+    private void logRequestContent(CustomHttpServletRequestWrapper request, LogContentContainer container) throws IOException {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
             return;
@@ -177,43 +183,49 @@ public class HttpLogUtil {
         String mediaMainType = mediaType.getType() + "/" + mediaType.getSubtype();
         if (visible) {
             if (mediaType.equals(MediaType.APPLICATION_JSON) || mediaMainType.equals("application/json")) {
-                extractBody(request, msg, true);
+                extractBody(request, container, true);
             } else if (mediaType.equals(MediaType.APPLICATION_FORM_URLENCODED) || mediaMainType.equals("application/x-www-form-urlencoded")) {
-                extractFormBody(request, msg);
+                container.setFormBody(true);
+                extractFormBody(request, container);
             } else {
-                extractBody(request, msg, false);
+                extractBody(request, container, false);
             }
         } else {
-            msg.append(String.format("unsupported media type")).append("\n");
+            container.setHasErrorInBodyRendering(true);
+            container.getErrorParam().put("unsupported media type", mediaType);
         }
     }
 
-    private void extractFormBody(CustomHttpServletRequestWrapper request, StringBuilder msg) {
+    private void extractFormBody(CustomHttpServletRequestWrapper request, LogContentContainer container) {
         Map<String, String[]> parameterMap = request.getParameterMap();
-        msg.append("form parameters:\n");
+        StringBuilder msg = new StringBuilder();
         if (parameterMap != null) {
+            msg.append("\n");
             for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-                msg.append(entry.getKey() + " : ");
+                msg.append(entry.getKey()).append(" : ");
                 if (entry.getValue() != null && entry.getValue().length > 0) {
                     for (String value : entry.getValue()) {
                         String replacedValue = replaceHelperDecider.replace(entry.getKey(), value);
-                        msg.append(replacedValue + ",");
+                        msg.append(replacedValue).append(",");
                     }
                     msg.deleteCharAt(msg.length() - 1);
                 }
                 msg.append("\n");
             }
         }
+        container.setBody(msg.toString());
     }
 
-    private void extractBody(CustomHttpServletRequestWrapper request, StringBuilder msg, boolean maskContent) throws IOException {
+    private void extractBody(CustomHttpServletRequestWrapper request, LogContentContainer container, boolean maskContent) throws IOException {
         byte[] content = request.getInputStream().getInputByteArray();
         if (content.length > 0) {
+            StringBuilder msg = new StringBuilder();
             String contentString = new String(content, StandardCharsets.UTF_8);
             if (maskContent) {
                 contentString = replaceHelperDecider.replace(contentString);
             }
-            Stream.of(contentString.split("\r\n|\r|\n")).forEach(line -> msg.append(line).append("\n"));
+            Stream.of(contentString.split("\r\n|\r|\n")).forEach(msg::append);
+            container.setBody(msg.toString());
         }
     }
 }

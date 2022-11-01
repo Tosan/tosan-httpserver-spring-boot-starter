@@ -3,6 +3,9 @@ package com.tosan.http.server.starter.annotation;
 import java.lang.annotation.*;
 
 /**
+ * @author AmirHossein ZamanZade
+ * @since 10/30/2022
+ * <p>
  * Annotation for calculating the execution statistics of internal service calls
  * <br>
  * Statistics are obtained from this annotation will be logged after request completion

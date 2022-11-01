@@ -9,11 +9,13 @@ import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.util.HttpLogUtil;
+import com.tosan.http.server.starter.util.LogContentProvider;
 import com.tosan.http.server.starter.util.MdcUtil;
 import com.tosan.tools.mask.starter.business.enumeration.ComparisonType;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.configuration.MaskBeanConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -88,5 +90,11 @@ public class TestConfiguration {
         List<String> excludeUrlPatterns = Collections.singletonList("/testUrl");
         httpMdcFilter.setExcludeUrlPatterns(excludeUrlPatterns);
         return httpMdcFilter;
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "http.log.format", havingValue = "test")
+    public LogContentProvider testHttpLogContentProvider() {
+        return new TestHttpLogContentProvider();
     }
 }

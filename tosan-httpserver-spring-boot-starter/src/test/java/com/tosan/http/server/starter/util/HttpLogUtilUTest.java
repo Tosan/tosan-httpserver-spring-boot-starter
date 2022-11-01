@@ -1,25 +1,26 @@
 package com.tosan.http.server.starter.util;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import com.tosan.http.server.starter.wrapper.CustomHttpServletRequestWrapper;
+import com.tosan.http.server.starter.wrapper.HttpTitleType;
+import com.tosan.http.server.starter.wrapper.LogContentContainer;
 import com.tosan.tools.mask.starter.dto.JsonReplaceResultDto;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static com.tosan.http.server.starter.TestLogUtil.getAppenderList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * @author M.khoshnevisan
- * @since 6/23/2021
+ * @author AmirHossein ZamanZade
+ * @since 10/29/2022
  */
 public class HttpLogUtilUTest {
 
@@ -32,11 +33,13 @@ public class HttpLogUtilUTest {
     private String testUri = "/test";
     private CustomHttpServletRequestWrapper.CachedServletInputStream inputStream;
     private Integer responseStatus = 200;
+    private LogContentProvider logContentProvider;
 
     @BeforeEach
     public void setup() throws IOException {
         replaceHelperDecider = mock(JsonReplaceHelperDecider.class);
-        httpLogUtil = new HttpLogUtil(replaceHelperDecider);
+        logContentProvider = mock(LogContentProvider.class);
+        httpLogUtil = new HttpLogUtil(replaceHelperDecider, logContentProvider);
         request = mock(CustomHttpServletRequestWrapper.class);
         when(request.getMethod()).thenReturn(testMethod);
         when(request.getRequestURI()).thenReturn(testUri);
@@ -50,20 +53,19 @@ public class HttpLogUtilUTest {
 
     @Test
     public void testLogRequest_WithoutQueryString_correctWebMethodAndPathLogging() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(request.getHeaderNames()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[1], "-- Http Request --");
-        assertEquals(messageSplit[2], testMethod + " " + testUri);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(HttpTitleType.REQUEST, container.getTitle());
+        assertEquals(testMethod + " " + testUri, container.getUrl());
     }
 
     @Test
     public void testLogRequest_WithQueryString_correctQueryStringLogging() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "name=mina&description=test";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
@@ -71,14 +73,14 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
         when(replaceHelperDecider.replace(eq("description"), eq("test"))).thenReturn("test");
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + queryString);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(testMethod + " " + testUri + "?" + queryString, container.getUrl());
     }
 
     @Test
     public void testLogRequest_WithSensitiveQueryString_correctQueryStringLogging() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "name=mina&description=test";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
@@ -86,54 +88,54 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("maskedValue");
         when(replaceHelperDecider.replace(eq("description"), eq("test"))).thenReturn("maskedVal2");
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + "name=maskedValue&description=maskedVal2");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(testMethod + " " + testUri + "?" + "name=maskedValue&description=maskedVal2", container.getUrl());
     }
 
     @Test
     public void testLogRequest_emptyQueryString_correctQueryStringLogging() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[2], testMethod + " " + testUri + "?");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(testMethod + " " + testUri + "?", container.getUrl());
     }
 
     @Test
     public void testLogRequest_oneQueryString_correctQueryStringLogging() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "name=mina";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + queryString);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(testMethod + " " + testUri + "?" + queryString, container.getUrl());
     }
 
     @Test
     public void testLogRequest_wrongFormatOfQueryString_logQueryStringWithNoChange() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         String queryString = "name=m=ina";
         when(request.getQueryString()).thenReturn(queryString);
         when(request.getHeaderNames()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[2], testMethod + " " + testUri + "?" + queryString);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(testMethod + " " + testUri + "?" + queryString, container.getUrl());
     }
 
     @Test
     public void testLogRequest_withSensitiveHeaderStringType_returnReplacerResult() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
         when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
@@ -151,15 +153,15 @@ public class HttpLogUtilUTest {
         String maskedValue = "maskedVal**";
         when(replaceHelperDecider.replace(eq(headerName), eq(sensitiveValue))).thenReturn(maskedValue);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], headerName + ": " + maskedValue);
-        assertFalse(message.contains(sensitiveValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(maskedValue, container.getHeaders().get(headerName));
     }
 
     @Test
     public void testLogRequest_withHeaderContainingUrlWithoutQueryParam_returnUnmaskedUrlAsHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
         when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
@@ -174,15 +176,15 @@ public class HttpLogUtilUTest {
         when(request.getHeaders(anyString())).thenReturn(headerValues);
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], headerName + ": " + urlValue);
-        assertTrue(message.contains(urlValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(urlValue, container.getHeaders().get(headerName));
     }
 
     @Test
     public void testLogRequest_withHeaderContainingUrlWithUnsensitiveQueryParams_returnUnmaskedUrlAsHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
         when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
@@ -199,15 +201,15 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq("name"), eq("mina"))).thenReturn("mina");
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], headerName + ": " + urlValue);
-        assertTrue(message.contains(urlValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(urlValue, container.getHeaders().get(headerName));
     }
 
     @Test
     public void testLogRequest_withHeaderContainingUrlWithSensitiveQueryParams_returnMaskedUrlAsHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
         when(headerNames.hasMoreElements()).thenReturn(true).thenReturn(false);
@@ -226,16 +228,16 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq("family"), eq("kh"))).thenReturn("kh");
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(headerName + ": " + "https://customer.com/api/payman/PaymanReturn?name=mina&secret=1**&family=kh",
-                messageSplit[3]);
-        assertFalse(message.contains(urlValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals("https://customer.com/api/payman/PaymanReturn?name=mina&secret=1**&family=kh",
+                container.getHeaders().get(headerName));
     }
 
     @Test
     public void testLogRequest_withJsonHeader_maskHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
@@ -255,17 +257,17 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(anyString(), any())).thenReturn(maskedValue);
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], headerName + ": " + maskedValue);
-        assertFalse(message.contains(sensitiveValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(maskedValue, container.getHeaders().get(headerName));
         verify(replaceHelperDecider, times(1)).checkJsonAndReplace(eq(sensitiveValue));
         verify(replaceHelperDecider, times(1)).replace(anyString(), any());
     }
 
     @Test
-    public void testLogRequest_withNormalHeader_addRawHeader() throws IOException {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+    public void testLogRequest_withNormalHeader_addRawHeader() {
         when(request.getQueryString()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[0]);
         Enumeration<String> headerNames = mock(Enumeration.class);
@@ -284,28 +286,31 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(anyString(), any())).thenReturn(value);
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], sampleHeader + ": " + value);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(sampleHeader));
+        assertEquals(value, container.getHeaders().get(sampleHeader));
     }
 
     @Test
     public void testLogRequest_withInvisibleBodyType_showBodyLength() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[1]);
         when(request.getHeaderNames()).thenReturn(null);
         when(request.getContentType()).thenReturn("multipart/mixed");
 
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "unsupported media type");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.hasErrorInBodyRendering());
+        assertTrue(container.getErrorParam().containsKey("unsupported media type"));
+        assertEquals("multipart/mixed", container.getErrorParam().get("unsupported media type").toString());
     }
 
     @Test
-    public void testLogRequest_withApplicationJsonType_showMaskedJson() throws IOException {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+    public void testLogRequest_withApplicationJsonType_showMaskedJson() {
         when(request.getQueryString()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn(new byte[1]);
         when(request.getHeaderNames()).thenReturn(null);
@@ -313,43 +318,43 @@ public class HttpLogUtilUTest {
         String maskedJson = "maskedJson";
         when(replaceHelperDecider.replace(anyString())).thenReturn(maskedJson);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], maskedJson);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(maskedJson, container.getBody());
         verify(replaceHelperDecider, times(1)).replace(anyString());
     }
 
     @Test
     public void testLogRequest_withApplicationTextType_showOriginalText() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(inputStream.getInputByteArray()).thenReturn("test".getBytes(StandardCharsets.UTF_8));
         when(request.getHeaderNames()).thenReturn(null);
         when(request.getContentType()).thenReturn("text/plain");
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "test");
         verify(replaceHelperDecider, times(0)).replace(anyString());
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals("test", container.getBody());
     }
 
     @Test
     public void testLogRequest_withFormUrlEncodedTypeWithNullParameterMap_emptyParameters() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(request.getHeaderNames()).thenReturn(null);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
         when(request.getParameterMap()).thenReturn(null);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "form parameters:");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.isFormBody());
         verify(replaceHelperDecider, times(0)).replace(anyString(), anyString());
     }
 
     @Test
     public void testLogRequest_withFormUrlEncodedTypeWithEmptyValues_logParameterKey() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(request.getHeaderNames()).thenReturn(null);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
@@ -358,16 +363,16 @@ public class HttpLogUtilUTest {
         parameterMap.put(parameterKey, null);
         when(request.getParameterMap()).thenReturn(parameterMap);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "form parameters:");
-        assertEquals(messageSplit[5], parameterKey + " : ");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.isFormBody());
+        assertEquals("\n" + parameterKey + " : \n", container.getBody());
         verify(replaceHelperDecider, times(0)).replace(anyString(), anyString());
     }
 
     @Test
     public void testLogRequest_withFormUrlEncodedTypeWithFilledValues_logMaskedParameterValues() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getQueryString()).thenReturn(null);
         when(request.getHeaderNames()).thenReturn(null);
         when(request.getContentType()).thenReturn("application/x-www-form-urlencoded");
@@ -385,10 +390,11 @@ public class HttpLogUtilUTest {
         String maskedValue2 = "maskedValue2";
         when(replaceHelperDecider.replace(eq(parameterKey), eq(testValue2))).thenReturn(maskedValue2);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "form parameters:");
-        assertEquals(messageSplit[5], parameterKey + " : " + maskedValue1 + "," + maskedValue2);
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.isFormBody());
+        assertEquals("\n" + parameterKey + " : " + maskedValue1 + "," + maskedValue2 + "\n", container.getBody());
         verify(replaceHelperDecider, times(0)).replace(anyString());
     }
 
@@ -410,32 +416,33 @@ public class HttpLogUtilUTest {
 
     @Test
     public void testLogRequest_withInvalidBody_logErrorInRequestBody() throws IOException {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(request.getContentType()).thenReturn("application/json");
         when(request.getQueryString()).thenReturn(null);
         when(request.getInputStream()).thenThrow(IOException.class);
         when(request.getHeaderNames()).thenReturn(null);
         httpLogUtil.logRequest(request);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "[error in request body reading : null]");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.hasErrorInBodyRendering());
+        assertTrue(container.getErrorParam().containsKey("error in request body reading"));
+        assertNull(container.getErrorParam().get("error in request body reading"));
     }
 
     @Test
-    public void testLogResponse_withResponseHeader_correctResponseHeaderLog() throws IOException {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+    public void testLogResponse_withResponseHeader_correctResponseHeaderLog() {
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[0]);
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[1], "-- Http Response --");
-        assertEquals(messageSplit[2], responseStatus + " OK");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(HttpTitleType.RESPONSE, container.getTitle());
+        assertEquals(responseStatus + " OK", container.getStatus());
     }
 
     @Test
-    public void testLogResponse_withSensitiveResponseHeader_maskSensitiveHeader() throws IOException {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
+    public void testLogResponse_withSensitiveResponseHeader_maskSensitiveHeader() {
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[0]);
         Collection<String> headerNames = new ArrayList<>();
@@ -452,15 +459,15 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq(headerName), eq(sensitiveValue))).thenReturn(maskedValue);
 
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(headerName + ": " + maskedValue, messageSplit[3]);
-        assertFalse(message.contains(sensitiveValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(maskedValue, container.getHeaders().get(headerName));
     }
 
     @Test
     public void testLogResponse_withJsonHeader_maskHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[0]);
 
@@ -479,16 +486,16 @@ public class HttpLogUtilUTest {
         when(jsonReplaceResultDto.isJson()).thenReturn(true);
 
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], "context: " + maskedValue);
-        assertFalse(message.contains(sensitiveValue));
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(headerName));
+        assertEquals(maskedValue, container.getHeaders().get(headerName));
         verify(replaceHelperDecider, times(1)).checkJsonAndReplace(eq(sensitiveValue));
     }
 
     @Test
     public void testLogResponse_withNormalHeader_addRawHeader() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[0]);
 
@@ -506,14 +513,16 @@ public class HttpLogUtilUTest {
         when(replaceHelperDecider.replace(eq(sampleHeaderName), eq(value))).thenReturn(value);
 
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[3], sampleHeaderName + ": " + value);
+
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.getHeaders().containsKey(sampleHeaderName));
+        assertEquals(value, container.getHeaders().get(sampleHeaderName));
     }
 
     @Test
     public void testLogResponse_withInvisibleBodyType_showBodyLength() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[1]);
 
@@ -521,14 +530,16 @@ public class HttpLogUtilUTest {
         when(response.getContentType()).thenReturn("multipart/mixed");
 
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "[1 bytes content]");
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertTrue(container.hasErrorInBodyRendering());
+        assertTrue(container.getErrorParam().containsKey("content bytes"));
+        assertEquals(1, container.getErrorParam().get("content bytes"));
     }
 
     @Test
     public void testLogResponse_withApplicationJsonType_showMaskedJson() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn(new byte[1]);
         when(response.getHeaderNames()).thenReturn(null);
@@ -536,24 +547,25 @@ public class HttpLogUtilUTest {
         String maskedJson = "maskedJson";
         when(replaceHelperDecider.replace(anyString())).thenReturn(maskedJson);
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], maskedJson);
         verify(replaceHelperDecider, times(1)).replace(anyString());
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals(maskedJson, container.getBody());
     }
 
     @Test
     public void testLogResponse_withApplicationTextType_showOriginalText() {
-        ListAppender<ILoggingEvent> listAppender = getAppenderList(HttpLogUtil.class);
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentAsByteArray()).thenReturn("test".getBytes(StandardCharsets.UTF_8));
         when(response.getHeaderNames()).thenReturn(null);
         when(response.getContentType()).thenReturn("text/plain");
         httpLogUtil.logResponse(response);
-        String message = listAppender.list.get(0).getMessage();
-        String[] messageSplit = message.split("\n");
-        assertEquals(messageSplit[4], "test");
         verify(replaceHelperDecider, times(0)).replace(anyString());
+        ArgumentCaptor<LogContentContainer> captor = ArgumentCaptor.forClass(LogContentContainer.class);
+        verify(logContentProvider, times(1)).generateLogContent(captor.capture());
+        LogContentContainer container = captor.getValue();
+        assertEquals("test", container.getBody());
     }
 
     /*@Test
