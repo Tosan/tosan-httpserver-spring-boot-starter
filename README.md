@@ -156,8 +156,41 @@ content-length: 73
 {"secretKey":"*SEMI_ENCRYPTED:sec","password":"ENCRYPTED"}
 ```
 
+### http log format
+
+format of http log can be defined by `http.log.format` config , this config accept 2 value : `raw, json`.
+NOTE: The default format is `raw`.
+for customize the format of http log you must implement `LogContentProvider`.
+sample of customizing http log format:
+
+```
+public class TestHttpLogContentProvider extends LogContentProvider {
+    @Override
+    protected String generateRequestLogContent(LogContentContainer container) {
+        return "-- Http Request --";
+    }
+
+    @Override
+    protected String generateResponseLogContent(LogContentContainer container) {
+        return "-- Http Response --";
+    }
+}
+
+```
+
+bean of TestHttpLogContentProvider
+
+```
+    @Bean
+    @ConditionalOnProperty(value = "http.log.format", havingValue = "test")
+    public LogContentProvider testHttpLogContentProvider() {
+        return new TestHttpLogContentProvider();
+    }
+```
+
 as it's clear some parameters are masked in http header and http body. these parameters can be specified by defining
 SecureParametersConfig bean. in this library this bean is defined by default as below:
+
 ```
     @Bean("http-server-util-secured-parameters")
     @ConditionalOnMissingBean(name = "http-server-util-secured-parameters")

@@ -140,7 +140,7 @@ public class HttpLogUtil {
         try {
             logRequestContent(request, container);
         } catch (IOException e) {
-            container.setHasError(true);
+            container.setHasErrorInBodyRendering(true);
             container.getErrorParam().put("error in request body reading", e.getMessage());
         }
     }
@@ -168,7 +168,7 @@ public class HttpLogUtil {
             Stream.of(contentString.split("\r\n|\r|\n")).forEach(msg::append);
             container.setBody(msg.toString());
         } else {
-            container.setHasError(true);
+            container.setHasErrorInBodyRendering(true);
             container.getErrorParam().put("content bytes", content.length);
         }
     }
@@ -191,7 +191,7 @@ public class HttpLogUtil {
                 extractBody(request, container, false);
             }
         } else {
-            container.setHasError(true);
+            container.setHasErrorInBodyRendering(true);
             container.getErrorParam().put("unsupported media type", mediaType);
         }
     }

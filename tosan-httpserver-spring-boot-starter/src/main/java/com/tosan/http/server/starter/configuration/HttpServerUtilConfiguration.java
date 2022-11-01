@@ -71,7 +71,8 @@ public class HttpServerUtilConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public HttpLogUtil httpLogUtil(@Qualifier("http-server-util-regex-replace-helper") JsonReplaceHelperDecider replaceHelperDecider, LogContentProvider logContentProvider) {
+    public HttpLogUtil httpLogUtil(@Qualifier("http-server-util-regex-replace-helper") JsonReplaceHelperDecider replaceHelperDecider,
+                                   LogContentProvider logContentProvider) {
         return new HttpLogUtil(replaceHelperDecider, logContentProvider);
     }
 
@@ -140,14 +141,14 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "http.log.json.format.enabled")
+    @ConditionalOnProperty(value = "http.log.format", havingValue = "json")
     public LogContentProvider jsonHttpLogContentProvider() {
         return new JsonHttpLogContentProvider();
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    public LogContentProvider httpLogContentProvider() {
-        return new HttpLogContentProvider();
+    @ConditionalOnProperty(value = "http.log.format", havingValue = "raw", matchIfMissing = true)
+    public LogContentProvider rawHttpLogContentProvider() {
+        return new RawHttpLogContentProvider();
     }
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 /**
  * @author AmirHossein ZamanZade
  * @since 10/30/2022
+ * <p>
+ * This class is a container for http log content
  */
 public class LogContentContainer {
     private HttpTitleType title;
@@ -14,10 +16,12 @@ public class LogContentContainer {
     private Map<String, Object> headers;
     private String body;
     private boolean isFormBody;
-    private boolean hasError;
+    private boolean hasErrorInBodyRendering;
     private Map<String, Object> errorParam;
 
-
+    /**
+     * @return title
+     */
     public HttpTitleType getTitle() {
         return title;
     }
@@ -26,6 +30,9 @@ public class LogContentContainer {
         this.title = title;
     }
 
+    /**
+     * @return url (exp: POST /test)
+     */
     public String getUrl() {
         return url;
     }
@@ -34,6 +41,9 @@ public class LogContentContainer {
         this.url = url;
     }
 
+    /**
+     * @return headers
+     */
     public Map<String, Object> getHeaders() {
         if (headers == null) {
             headers = new LinkedHashMap<>();
@@ -41,6 +51,9 @@ public class LogContentContainer {
         return headers;
     }
 
+    /**
+     * @return body
+     */
     public String getBody() {
         return body;
     }
@@ -49,6 +62,9 @@ public class LogContentContainer {
         this.body = body;
     }
 
+    /**
+     * @return is form parameter
+     */
     public boolean isFormBody() {
         return isFormBody;
     }
@@ -57,6 +73,9 @@ public class LogContentContainer {
         isFormBody = formBody;
     }
 
+    /**
+     * @return status of response
+     */
     public String getStatus() {
         return status;
     }
@@ -65,14 +84,20 @@ public class LogContentContainer {
         this.status = status;
     }
 
-    public boolean hasError() {
-        return hasError;
+    /**
+     * @return show that rendering body has error or not
+     */
+    public boolean hasErrorInBodyRendering() {
+        return hasErrorInBodyRendering;
     }
 
-    public void setHasError(boolean hasError) {
-        this.hasError = hasError;
+    public void setHasErrorInBodyRendering(boolean hasErrorInBodyRendering) {
+        this.hasErrorInBodyRendering = hasErrorInBodyRendering;
     }
 
+    /**
+     * @return if {@link #hasErrorInBodyRendering()} is true this method return error params otherwise return empty map
+     */
     public Map<String, Object> getErrorParam() {
         if (errorParam == null) {
             errorParam = new LinkedHashMap<>();

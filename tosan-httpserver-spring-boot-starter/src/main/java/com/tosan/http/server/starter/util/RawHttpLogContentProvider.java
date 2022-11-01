@@ -1,6 +1,7 @@
 package com.tosan.http.server.starter.util;
 
 import com.tosan.http.server.starter.wrapper.LogContentContainer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  * @author AmirHossein ZamanZade
  * @since 10/29/2022
  */
-public class HttpLogContentProvider extends LogContentProvider {
+public class RawHttpLogContentProvider extends LogContentProvider {
 
     @Override
     protected String generateRequestLogContent(LogContentContainer container) {
@@ -16,13 +17,15 @@ public class HttpLogContentProvider extends LogContentProvider {
         requestContent.append("\n").append("-- Http Request --").append("\n");
         requestContent.append(container.getUrl()).append("\n");
         addHeader(container, requestContent);
-        if (container.hasError()) {
+        if (container.hasErrorInBodyRendering()) {
             addError(container, requestContent);
         } else {
             if (container.isFormBody()) {
                 requestContent.append("form parameters: ");
             }
-            requestContent.append(container.getBody());
+            if (!StringUtils.isEmpty(container.getBody())) {
+                requestContent.append(container.getBody());
+            }
         }
         return requestContent.toString();
     }
@@ -33,16 +36,18 @@ public class HttpLogContentProvider extends LogContentProvider {
         responseContent.append("\n").append("-- Http Response --").append("\n");
         responseContent.append(container.getStatus()).append("\n");
         addHeader(container, responseContent);
-        if (container.hasError()) {
+        if (container.hasErrorInBodyRendering()) {
             addError(container, responseContent);
         } else {
-            responseContent.append(container.getBody());
+            if (!StringUtils.isEmpty(container.getBody())) {
+                responseContent.append(container.getBody());
+            }
         }
         return responseContent.toString();
     }
 
     private void addHeader(LogContentContainer container, StringBuilder content) {
-        if (container.getHeaders() != null) {
+        if (!container.getHeaders().isEmpty()) {
             for (Map.Entry<String, Object> header : container.getHeaders().entrySet()) {
                 content.append(header.getKey()).append(": ").append(header.getValue()).append("\n");
             }
@@ -50,7 +55,7 @@ public class HttpLogContentProvider extends LogContentProvider {
     }
 
     private void addError(LogContentContainer container, StringBuilder content) {
-        if (container.getErrorParam() != null) {
+        if (!container.getErrorParam().isEmpty()) {
             for (Map.Entry<String, Object> header : container.getErrorParam().entrySet()) {
                 content.append(header.getKey()).append(": ").append(header.getValue()).append("\n");
             }
