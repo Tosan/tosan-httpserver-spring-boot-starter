@@ -77,7 +77,7 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean("http-server-util-regex-replace-helper")
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(name = "http-server-util-regex-replace-helper")
     public JsonReplaceHelperDecider replaceHelperDecider(
             JacksonReplaceHelper jacksonReplaceHelper,
             RegexReplaceHelper regexReplaceHelper,
@@ -109,8 +109,8 @@ public class HttpServerUtilConfiguration {
     }
 
     @Bean
-    public JsonServiceLogger jsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig) {
-        return new JsonServiceLogger(serviceLoggingConfig);
+    public JsonServiceLogger jsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig, ToStringJsonUtil toStringJsonUtil) {
+        return new JsonServiceLogger(serviceLoggingConfig, toStringJsonUtil);
     }
 
     @Bean
@@ -150,5 +150,11 @@ public class HttpServerUtilConfiguration {
     @ConditionalOnProperty(value = "http.log.format", havingValue = "raw", matchIfMissing = true)
     public LogContentProvider rawHttpLogContentProvider() {
         return new RawHttpLogContentProvider();
+    }
+
+    @Bean
+    public ToStringJsonUtil toStringJsonUtil(@Qualifier("http-server-util-regex-replace-helper")
+                                                         JsonReplaceHelperDecider jsonReplaceHelperDecider) {
+        return new ToStringJsonUtil(jsonReplaceHelperDecider);
     }
 }

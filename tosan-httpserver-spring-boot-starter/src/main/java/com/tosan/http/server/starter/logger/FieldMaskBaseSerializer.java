@@ -3,7 +3,7 @@ package com.tosan.http.server.starter.logger;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.tosan.tools.mask.starter.replace.StaticJsonReplaceHelperDecider;
+import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 
 import java.io.IOException;
 
@@ -13,6 +13,12 @@ import java.io.IOException;
  */
 public class FieldMaskBaseSerializer extends JsonSerializer<String> {
 
+    private final JsonReplaceHelperDecider jsonReplaceHelperDecider;
+
+    public FieldMaskBaseSerializer(JsonReplaceHelperDecider jsonReplaceHelperDecider) {
+        this.jsonReplaceHelperDecider = jsonReplaceHelperDecider;
+    }
+
     public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
             throws IOException {
 
@@ -20,7 +26,7 @@ public class FieldMaskBaseSerializer extends JsonSerializer<String> {
         if (value == null) {
             return;
         }
-        String maskedValue = StaticJsonReplaceHelperDecider.replace(fieldName, value);
+        String maskedValue = jsonReplaceHelperDecider.replace(fieldName, value);
         jsonGenerator.writeString(maskedValue);
     }
 }

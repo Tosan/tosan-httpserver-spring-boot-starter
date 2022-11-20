@@ -18,9 +18,11 @@ import java.util.Objects;
 public class JsonServiceLogger extends ServiceLogger {
 
     private final ServiceLoggingConfig serviceLoggingConfig;
+    private final ToStringJsonUtil toStringJsonUtil;
 
-    public JsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig) {
+    public JsonServiceLogger(ServiceLoggingConfig serviceLoggingConfig, ToStringJsonUtil toStringJsonUtil) {
         this.serviceLoggingConfig = serviceLoggingConfig;
+        this.toStringJsonUtil = toStringJsonUtil;
     }
 
     @Override
@@ -73,7 +75,7 @@ public class JsonServiceLogger extends ServiceLogger {
             }
             object.put(key, objectsMap);
         }
-        return ToStringJsonUtil.toJson(object);
+        return toStringJsonUtil.toJson(object);
     }
 
     public boolean ignoreArgument(Object object) {

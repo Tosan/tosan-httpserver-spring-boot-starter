@@ -51,7 +51,7 @@
 
     <properties>
         <java.version>8</java.version>
-        <tosan-mask-spring-boot-starter.version>1.0.4</tosan-mask-spring-boot-starter.version>
+        <tosan-mask-spring-boot-starter.version>1.0.5</tosan-mask-spring-boot-starter.version>
     </properties>
 
     <dependencyManagement>

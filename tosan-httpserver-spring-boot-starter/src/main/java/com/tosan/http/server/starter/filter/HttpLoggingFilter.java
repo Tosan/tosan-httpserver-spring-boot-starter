@@ -59,7 +59,7 @@ public class HttpLoggingFilter extends OncePerRequestFilterBase {
         }
     }
 
-    private static CustomHttpServletRequestWrapper wrapRequest(HttpServletRequest request) {
+    private CustomHttpServletRequestWrapper wrapRequest(HttpServletRequest request) {
         if (request instanceof CustomHttpServletRequestWrapper) {
             return (CustomHttpServletRequestWrapper) request;
         } else {
@@ -67,7 +67,7 @@ public class HttpLoggingFilter extends OncePerRequestFilterBase {
         }
     }
 
-    private static ContentCachingResponseWrapper wrapResponse(HttpServletResponse response) {
+    private ContentCachingResponseWrapper wrapResponse(HttpServletResponse response) {
         if (response instanceof ContentCachingResponseWrapper) {
             return (ContentCachingResponseWrapper) response;
         } else {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.tosan.http.server.starter.logger.FieldMaskBaseSerializer;
+import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 
 import java.text.SimpleDateFormat;
 
@@ -15,20 +16,26 @@ import java.text.SimpleDateFormat;
  * @since 6/10/2021
  */
 public class ToStringJsonUtil {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonReplaceHelperDecider jsonReplaceHelperDecider;
 
-    static {
+    public ToStringJsonUtil(JsonReplaceHelperDecider jsonReplaceHelperDecider) {
+        this.jsonReplaceHelperDecider = jsonReplaceHelperDecider;
+        customizeObjectMapper();
+    }
+
+    private void customizeObjectMapper() {
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new FieldMaskBaseSerializer());
+        module.addSerializer(String.class, new FieldMaskBaseSerializer(jsonReplaceHelperDecider));
         mapper.registerModule(module);
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'H:m:ssZ"));
     }
 
-    public static <T> String toJson(T object) {
+    public <T> String toJson(T object) {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
