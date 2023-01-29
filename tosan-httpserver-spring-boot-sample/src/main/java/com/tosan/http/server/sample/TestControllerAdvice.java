@@ -21,7 +21,6 @@ public class TestControllerAdvice {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<HttpServerException> handleThrowable(Throwable throwable) {
-        log.error("Exception: " + throwable.toString() + "\n", throwable);
         HttpServerException httpServerException = extractHttpServerException(throwable, new HashMap<>());
         return new ResponseEntity<>(httpServerException, HttpStatus.INTERNAL_SERVER_ERROR);
     }

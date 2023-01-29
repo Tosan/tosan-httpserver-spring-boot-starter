@@ -42,7 +42,7 @@ public class ServerUtilITest {
         TestRequestDto dto = new TestRequestDto();
         dto.setTest("testValue");
         dto.setPan("4039484849393094");
-        dto.setName("mina");
+        dto.setName("exceptionTest");
         dto.setFamily("kh");
         dto.setDate(new Date());
         dto.setMobileNumber("0984347384");

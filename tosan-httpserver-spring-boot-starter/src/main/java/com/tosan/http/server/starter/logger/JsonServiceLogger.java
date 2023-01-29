@@ -4,12 +4,10 @@ package com.tosan.http.server.starter.logger;
 import com.tosan.http.server.starter.config.ServiceLoggingConfig;
 import com.tosan.http.server.starter.util.ToStringJsonUtil;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Mostafa Abdollahi
@@ -45,14 +43,15 @@ public class JsonServiceLogger extends ServiceLogger {
         return createJson(serviceName, "exception", new Object[]{exception}, null, duration);
     }
 
-    private String getStackTrace(final Throwable throwable) {
-        if (Objects.nonNull(throwable.getCause())) {
-            return this.getStackTrace(throwable.getCause());
+    private List<String> getStackTrace(final Throwable throwable) {
+        List<String> stackTrace = new ArrayList<>();
+        for (StackTraceElement element : throwable.getStackTrace()) {
+            stackTrace.add(element.toString());
+            if (stackTrace.size() > 14) {
+                break;
+            }
         }
-        StringWriter stackTrace = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stackTrace, true);
-        throwable.printStackTrace(printWriter);
-        return stackTrace.getBuffer().toString();
+        return stackTrace;
     }
 
     private String createJson(String serviceName, String key, Object[] objects, Object[] parameterNames, Double duration) {
