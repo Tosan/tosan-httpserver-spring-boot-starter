@@ -12,7 +12,7 @@
     <groupId>com.tosan.server.http</groupId>
     <artifactId>tosan-httpserver-spring-boot-root</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
 
     <name>tosan-httpserver-spring-boot-starter</name>
     <description>This project provides an Spring-Boot Starter that facilitate common requirements of a rest server like
