@@ -4,6 +4,7 @@ import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.config.RandomGenerationType;
 import com.tosan.http.server.starter.config.RandomParameter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -11,7 +12,6 @@ import org.slf4j.MDC;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,7 +25,7 @@ public class MdcUtilUTest {
 
     private MdcUtil mdcUtil;
     private MdcFilterConfig mdcFilterConfig;
-    private static MockedStatic<RequestContextHolder> requestContextHolderMockedStatic =
+    private static final MockedStatic<RequestContextHolder> requestContextHolderMockedStatic =
             mockStatic(RequestContextHolder.class);
 
     @BeforeEach
