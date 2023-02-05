@@ -30,12 +30,6 @@ jobs:
           git config user.name "GitHub Actions"
       - name: Build with Maven
         run: mvn -B package --file pom.xml
-      - name: Publish to the Maven Central Repository
-        run: |
-          mvn \
-            --no-transfer-progress \
-            --batch-mode \
-            deploy -Pbuild
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
