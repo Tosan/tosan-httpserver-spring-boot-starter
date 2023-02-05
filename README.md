@@ -423,7 +423,7 @@ attention: if you have any input of type HttpServletRequest, this input will be 
 You can find a sample project in tosan-httpserver-spring-boot-sample module
 
 ### Prerequisites
-This Library requires java version 8 or above.
+This Library requires java version 17 or above.
 
 ## Contributing
 Any contribution is greatly appreciated.

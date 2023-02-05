@@ -18,6 +18,7 @@ import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,7 @@ import static com.tosan.http.server.starter.util.Constants.PROXY_AUTHORIZATION_S
  * @author mina khoshnevisan
  * @since 7/12/2022
  */
+@AutoConfiguration
 @Configuration
 public class HttpServerUtilConfiguration {
 
