@@ -2,9 +2,9 @@ name: Build per push
 
 on:
   push:
-    branches: [ main ]
+    branches: [ spring-boot2 ]
   pull_request:
-    branches: [ main ]
+    branches: [ spring-boot2 ]
 
 jobs:
   build:
