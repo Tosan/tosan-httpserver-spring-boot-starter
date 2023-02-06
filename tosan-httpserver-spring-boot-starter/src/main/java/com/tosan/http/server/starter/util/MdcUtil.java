@@ -4,13 +4,13 @@ import com.tosan.http.server.starter.config.HttpHeaderMdcParameter;
 import com.tosan.http.server.starter.config.MdcFilterConfig;
 import com.tosan.http.server.starter.config.RandomGenerationType;
 import com.tosan.http.server.starter.config.RandomParameter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -49,12 +49,10 @@ public class MdcUtil {
             RandomGenerationType generationType = randomParameter.getGenerationType();
             if (generationType != null) {
                 switch (generationType) {
-                    case ALPHANUMERIC:
-                        value = randomParameter.getPrefix() + RandomStringUtils.randomAlphanumeric(randomParameter.getLength());
-                        break;
-                    case NUMERIC:
-                        value = randomParameter.getPrefix() + RandomStringUtils.randomNumeric(randomParameter.getLength());
-                        break;
+                    case ALPHANUMERIC ->
+                            value = randomParameter.getPrefix() + RandomStringUtils.randomAlphanumeric(randomParameter.getLength());
+                    case NUMERIC ->
+                            value = randomParameter.getPrefix() + RandomStringUtils.randomNumeric(randomParameter.getLength());
                 }
             }
         }
