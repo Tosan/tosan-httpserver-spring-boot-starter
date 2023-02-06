@@ -15,7 +15,10 @@ import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +26,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.validation.BindingResult;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import static com.tosan.http.server.starter.util.Constants.PROXY_AUTHORIZATION_S
  * @author mina khoshnevisan
  * @since 7/12/2022
  */
+@AutoConfiguration
 @Configuration
 public class HttpServerUtilConfiguration {
 
@@ -154,7 +156,7 @@ public class HttpServerUtilConfiguration {
 
     @Bean
     public ToStringJsonUtil toStringJsonUtil(@Qualifier("http-server-util-regex-replace-helper")
-                                                         JsonReplaceHelperDecider jsonReplaceHelperDecider) {
+                                             JsonReplaceHelperDecider jsonReplaceHelperDecider) {
         return new ToStringJsonUtil(jsonReplaceHelperDecider);
     }
 }

@@ -1,10 +1,9 @@
 package com.tosan.http.server.starter.filter;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.AntPathMatcher;
-
-import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.*;
  */
 public class OncePerRequestFilterBaseUTest {
 
-    private OncePerRequestFilterBase oncePerRequestFilterBase = new HttpLoggingFilter(null);
+    private final OncePerRequestFilterBase oncePerRequestFilterBase = new HttpLoggingFilter(null);
     private AntPathMatcher antPathMatcher;
 
     @BeforeEach
