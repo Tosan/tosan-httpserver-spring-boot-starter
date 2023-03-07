@@ -61,11 +61,6 @@
                 <artifactId>tosan-mask-spring-boot-starter</artifactId>
                 <version>${tosan-mask-spring-boot-starter.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.tosan.server.http</groupId>
-                <artifactId>tosan-httpserver-spring-boot-starter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

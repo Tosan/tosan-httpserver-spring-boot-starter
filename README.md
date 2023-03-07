@@ -350,7 +350,7 @@ public void internalService() {
 ```
 
 ```
-{ "-service" : "GET /httpserver/internalStatistics", "total duration" : "2.043s", "active requests" : 0, "statistics" : [ "-service : InternalWebService.internalService : 1s" ] } 
+{ "-service" : "GET /httpserver/internalStatistics", "duration" : "2.043s", "active requests" : 0, "statistics" : [ "InternalWebService.internalService: 1.012s" ] } 
 ```
 
 ### ServiceLogAspect
