@@ -14,6 +14,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +46,7 @@ public class ServerUtilITest {
         dto.setName("exceptionTest");
         dto.setFamily("kh");
         dto.setDate(new Date());
+        dto.setLocalDate(LocalDate.now());
         dto.setMobileNumber("0984347384");
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +

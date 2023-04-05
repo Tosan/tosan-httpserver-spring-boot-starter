@@ -32,6 +32,7 @@ public class ToStringJsonUtil {
         SimpleModule module = new SimpleModule();
         module.addSerializer(String.class, new FieldMaskBaseSerializer(jsonReplaceHelperDecider));
         mapper.registerModule(module);
+        mapper.findAndRegisterModules();
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'H:m:ssZ"));
     }
 

@@ -3,6 +3,7 @@ package com.tosan.http.server.sample.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -17,5 +18,6 @@ public class TestRequestDto {
     private String pan;
     private String test;
     private Date date;
+    private LocalDate localDate;
     private String mobileNumber;
 }
