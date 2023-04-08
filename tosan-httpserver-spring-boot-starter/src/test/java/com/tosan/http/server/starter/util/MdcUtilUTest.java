@@ -130,27 +130,19 @@ public class MdcUtilUTest {
 
     @Test
     public void testFillRemoteClientIp_nullRemoteAddressAndNullXForward_noRemoteAddressInMdc() {
-        ServletRequestAttributes servletRequestAttribute = mock(ServletRequestAttributes.class);
-        requestContextHolderMockedStatic.when(() -> RequestContextHolder.getRequestAttributes()).thenReturn(servletRequestAttribute);
-        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-        when(servletRequestAttribute.getRequest()).thenReturn(httpServletRequest);
-        when(httpServletRequest.getRemoteAddr()).thenReturn(null);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(null);
+        when(request.getRemoteAddr()).thenReturn(null);
         mdcUtil.fillRemoteClientIp(request);
         assertNull(MDC.get(Constants.MDC_CLIENT_IP));
     }
 
     @Test
     public void testFillRemoteClientIp_haveRemoteAddressButNoExForwarded_fillRemoteAddressInMdc() {
-        ServletRequestAttributes servletRequestAttribute = mock(ServletRequestAttributes.class);
-        requestContextHolderMockedStatic.when(() -> RequestContextHolder.getRequestAttributes()).thenReturn(servletRequestAttribute);
-        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-        when(servletRequestAttribute.getRequest()).thenReturn(httpServletRequest);
         String remoteAddress = "127.0.0.1";
-        when(httpServletRequest.getRemoteAddr()).thenReturn(remoteAddress);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader(eq(Constants.X_FORWARDED_FOR))).thenReturn(null);
+        when(request.getRemoteAddr()).thenReturn(remoteAddress);
         mdcUtil.fillRemoteClientIp(request);
         assertEquals(remoteAddress, MDC.get(Constants.MDC_CLIENT_IP));
     }
