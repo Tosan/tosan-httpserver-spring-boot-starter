@@ -82,7 +82,7 @@ public class MdcUtil {
                 clientIp = clientIp.substring(0, clientAddressIndex);
             }
         } else {
-            clientIp = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getRemoteAddr();
+            clientIp = request.getRemoteAddr();
         }
         if (clientIp != null) {
             MDC.put(Constants.MDC_CLIENT_IP, clientIp.trim());
