@@ -33,13 +33,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @Order(20)
 public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpStatisticsFilter.class);
-
     private static final AtomicLong activeRequestsCount = new AtomicLong(0);
     private static final DefaultPrettyPrinter printer;
     private static final ObjectWriter writer;
     private static final ObjectMapper mapper;
 
-    private static final ArrayList<String> STATISTICS_DEFAULT_EXCLUDE_URL_PATTERNS = new ArrayList<String>() {{
+    private static final ArrayList<String> STATISTICS_DEFAULT_EXCLUDE_URL_PATTERNS = new ArrayList<>() {{
         add(Constants.DEFAULT_SWAGGER_EXCLUDE_PATTERN);
         add(Constants.DEFAULT_API_DOCS_EXCLUDE_PATTERN);
         add(Constants.DEFAULT_FAVICON_EXCLUDE_PATTERN);
@@ -47,17 +46,15 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     }};
 
     static {
-        mapper = (new ObjectMapper())
+        mapper = new ObjectMapper()
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        printer = (new DefaultPrettyPrinter()).withObjectIndenter(new DefaultPrettyPrinter.
-                FixedSpaceIndenter());
+        printer = new DefaultPrettyPrinter().withObjectIndenter(new DefaultPrettyPrinter.FixedSpaceIndenter());
         writer = mapper.writer(printer);
     }
 
     public HttpStatisticsFilter() {
-
         super.addExcludeUrlPatterns(STATISTICS_DEFAULT_EXCLUDE_URL_PATTERNS);
     }
 
@@ -99,12 +96,12 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
         List<String> statisticsDetail = new ArrayList<>();
         for (ServiceExecutionInfo serviceExecutionInfo : serviceExecutionInfos) {
             if (serviceExecutionInfo != null) {
-                if (StringUtils.isEmpty(serviceExecutionInfo.getServiceType())) {
-                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceName() + " : " +
-                            serviceExecutionInfo.getDuration() + "s");
+                if (StringUtils.isEmpty(serviceExecutionInfo.serviceType())) {
+                    statisticsDetail.add(serviceExecutionInfo.serviceName() + ": " +
+                            serviceExecutionInfo.duration() + "s");
                 } else {
-                    statisticsDetail.add("-service : " + serviceExecutionInfo.getServiceType() + "." +
-                            serviceExecutionInfo.getServiceName() + " : " + serviceExecutionInfo.getDuration() + "s");
+                    statisticsDetail.add(serviceExecutionInfo.serviceType() + "." + serviceExecutionInfo.serviceName() +
+                            ": " + serviceExecutionInfo.duration() + "s");
                 }
             }
         }
