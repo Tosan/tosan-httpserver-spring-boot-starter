@@ -10,8 +10,10 @@ import com.tosan.http.server.starter.statistics.Statistics;
 public class TimerStatisticsUtil {
 
     public void generateStatistics(String serviceType, String serviceName, long startTime, long endTime) {
-        ServiceExecutionInfo serviceExecutionInfo = new ServiceExecutionInfo(serviceType, serviceName,
-                (endTime - startTime) / 1000);
+        ServiceExecutionInfo serviceExecutionInfo = new ServiceExecutionInfo(
+                serviceType,
+                serviceName,
+                (endTime - startTime) / 1000.0);
         Statistics.getApplicationStatistics().getServiceExecutionsInfo().add(serviceExecutionInfo);
     }
 }

@@ -34,9 +34,8 @@ public class TimerStatisticsUtilUTest {
         assertNotNull(serviceExecutionInfos);
         ServiceExecutionInfo serviceExecutionInfo = serviceExecutionInfos.get(0);
         assertNotNull(serviceExecutionInfo);
-        assertEquals(serviceExecutionInfo.getServiceType(), serviceType);
-        assertEquals(serviceExecutionInfo.getServiceName(), serviceName);
-        assertEquals(serviceExecutionInfo.getDuration(), (endTime - startTime) / 1000);
+        assertEquals(serviceExecutionInfo.serviceType(), serviceType);
+        assertEquals(serviceExecutionInfo.serviceName(), serviceName);
+        assertEquals(serviceExecutionInfo.duration(), (endTime - startTime) / 1000);
     }
-
 }
