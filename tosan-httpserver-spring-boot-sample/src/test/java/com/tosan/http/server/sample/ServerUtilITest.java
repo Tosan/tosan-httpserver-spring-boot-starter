@@ -169,6 +169,7 @@ public class ServerUtilITest {
                     request.getHeaders().add(Constants.X_FORWARDED_FOR, "192.168.16.49,192.168.16.50");
                     request.getHeaders().add("username", "mina948j");
                     request.getHeaders().add("context", "{\"secretKey\":\"456677\", \"test\":\"minaName\"}");
+                    request.getHeaders().add("x-api-key", "\"756464jhgf\"");
                     return execution.execute(request, body);
                 }));
     }
