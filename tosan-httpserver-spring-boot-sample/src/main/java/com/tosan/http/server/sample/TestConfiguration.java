@@ -43,6 +43,7 @@ public class TestConfiguration {
         securedParameters.add(new SecureParameter("test", UserMaskType.TEST_MASK_TYPE));
         securedParameters.add(new SecureParameter("username", UserMaskType.SEMI));
         securedParameters.add(new SecureParameter("mobile", UserMaskType.LEFT, ComparisonType.LEFT_LIKE));
+        securedParameters.add(new SecureParameter("x-api-key", UserMaskType.COMPLETE, ComparisonType.LIKE));
         return new SecureParametersConfig(securedParameters);
     }
 
