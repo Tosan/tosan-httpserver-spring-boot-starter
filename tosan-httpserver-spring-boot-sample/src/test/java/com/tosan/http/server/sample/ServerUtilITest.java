@@ -14,6 +14,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,11 @@ public class ServerUtilITest {
         dto.setDate(new Date());
         dto.setLocalDate(LocalDate.now());
         dto.setMobileNumber("0984347384");
+        dto.setTestNumber(84874);
+        dto.setAmount(new BigDecimal("49400000"));
+        dto.setAge((short) 45);
+        dto.setAverage(3.56444);
+        dto.setLength(400000);
         setHeader();
         TestResponseDto testResponseDto = this.restTemplate.postForObject("http://localhost:" + port +
                 "/httpserver/test", dto, TestResponseDto.class, new HashMap<>());
@@ -169,7 +175,7 @@ public class ServerUtilITest {
                     request.getHeaders().add(Constants.X_FORWARDED_FOR, "192.168.16.49,192.168.16.50");
                     request.getHeaders().add("username", "mina948j");
                     request.getHeaders().add("context", "{\"secretKey\":\"456677\", \"test\":\"minaName\"}");
-                    request.getHeaders().add("x-api-key", "\"756464jhgf\"");
+                    request.getHeaders().add("x-api-key", "\"7657443\"");
                     return execution.execute(request, body);
                 }));
     }

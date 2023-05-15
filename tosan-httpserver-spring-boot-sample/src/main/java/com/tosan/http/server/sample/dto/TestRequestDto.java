@@ -3,6 +3,7 @@ package com.tosan.http.server.sample.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -20,4 +21,9 @@ public class TestRequestDto {
     private Date date;
     private LocalDate localDate;
     private String mobileNumber;
+    private long testNumber;
+    private BigDecimal amount;
+    private short age;
+    private double average;
+    private int length;
 }

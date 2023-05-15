@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class TestRestController {
     @PostMapping(value = "/test",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public TestResponseDto testService(@RequestBody TestRequestDto dto) {
+    public TestResponseDto testService(@RequestBody TestRequestDto dto, @RequestHeader HttpHeaders headers) {
         TestResponseDto testResponseDto = new TestResponseDto();
         testResponseDto.setSecretKey("secret");
         testResponseDto.setPassword("954595");
