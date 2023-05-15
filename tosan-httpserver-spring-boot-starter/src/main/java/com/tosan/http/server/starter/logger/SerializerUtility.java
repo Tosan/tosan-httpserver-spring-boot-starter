@@ -1,28 +1,26 @@
 package com.tosan.http.server.starter.logger;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.core.JsonStreamContext;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 
 import java.io.IOException;
 
-/**
- * @author mina khoshnevisan
- * @since 7/31/2022
- */
-public class FieldMaskBaseSerializer extends JsonSerializer<String> {
-
+public class SerializerUtility {
     private final JsonReplaceHelperDecider jsonReplaceHelperDecider;
 
-    public FieldMaskBaseSerializer(JsonReplaceHelperDecider jsonReplaceHelperDecider) {
+    public SerializerUtility(JsonReplaceHelperDecider jsonReplaceHelperDecider) {
         this.jsonReplaceHelperDecider = jsonReplaceHelperDecider;
     }
 
-    public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-            throws IOException {
-
+    public void serialize(String value, JsonGenerator jsonGenerator) throws IOException {
         String fieldName = jsonGenerator.getOutputContext().getCurrentName();
+        if (fieldName == null) {
+            JsonStreamContext parent = jsonGenerator.getOutputContext().getParent();
+            if (parent != null) {
+                fieldName = parent.getCurrentName();
+            }
+        }
         if (value == null) {
             return;
         }

@@ -44,6 +44,11 @@ public class TestConfiguration {
         securedParameters.add(new SecureParameter("username", UserMaskType.SEMI));
         securedParameters.add(new SecureParameter("mobile", UserMaskType.LEFT, ComparisonType.LEFT_LIKE));
         securedParameters.add(new SecureParameter("x-api-key", UserMaskType.COMPLETE, ComparisonType.LIKE));
+        securedParameters.add(new SecureParameter("testNumber", UserMaskType.COMPLETE, ComparisonType.LIKE));
+        securedParameters.add(new SecureParameter("amount", UserMaskType.SEMI, ComparisonType.LIKE));
+        securedParameters.add(new SecureParameter("age", UserMaskType.LEFT, ComparisonType.EQUALS_IGNORE_CASE));
+        securedParameters.add(new SecureParameter("average", UserMaskType.RIGHT, ComparisonType.LIKE));
+        securedParameters.add(new SecureParameter("length", UserMaskType.SEMI, ComparisonType.LIKE));
         return new SecureParametersConfig(securedParameters);
     }
 

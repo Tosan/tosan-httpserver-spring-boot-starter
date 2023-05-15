@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.tosan.http.server.starter.logger.FieldMaskBaseSerializer;
+import com.tosan.http.server.starter.logger.NumberMaskSerializer;
+import com.tosan.http.server.starter.logger.SerializerUtility;
+import com.tosan.http.server.starter.logger.StringMaskSerializer;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 
 import java.text.SimpleDateFormat;
@@ -30,7 +32,16 @@ public class ToStringJsonUtil {
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new FieldMaskBaseSerializer(jsonReplaceHelperDecider));
+        SerializerUtility serializerUtility = new SerializerUtility(jsonReplaceHelperDecider);
+        StringMaskSerializer stringMaskSerializer = new StringMaskSerializer(serializerUtility);
+        NumberMaskSerializer numberMaskSerializer = new NumberMaskSerializer(serializerUtility);
+        module.addSerializer(String.class, stringMaskSerializer);
+        module.addSerializer(Number.class, numberMaskSerializer);
+        module.addSerializer(int.class, numberMaskSerializer);
+        module.addSerializer(long.class, numberMaskSerializer);
+        module.addSerializer(float.class, numberMaskSerializer);
+        module.addSerializer(double.class, numberMaskSerializer);
+        module.addSerializer(short.class, numberMaskSerializer);
         mapper.registerModule(module);
         mapper.findAndRegisterModules();
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'H:m:ssZ"));
