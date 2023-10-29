@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.tosan.http.server.starter.logger.MultipartMaskSerializer;
 import com.tosan.http.server.starter.logger.NumberMaskSerializer;
 import com.tosan.http.server.starter.logger.SerializerUtility;
 import com.tosan.http.server.starter.logger.StringMaskSerializer;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
 
@@ -35,6 +37,7 @@ public class ToStringJsonUtil {
         SerializerUtility serializerUtility = new SerializerUtility(jsonReplaceHelperDecider);
         StringMaskSerializer stringMaskSerializer = new StringMaskSerializer(serializerUtility);
         NumberMaskSerializer numberMaskSerializer = new NumberMaskSerializer(serializerUtility);
+        MultipartMaskSerializer multipartMaskSerializer = new MultipartMaskSerializer(serializerUtility);
         module.addSerializer(String.class, stringMaskSerializer);
         module.addSerializer(Number.class, numberMaskSerializer);
         module.addSerializer(int.class, numberMaskSerializer);
@@ -42,6 +45,7 @@ public class ToStringJsonUtil {
         module.addSerializer(float.class, numberMaskSerializer);
         module.addSerializer(double.class, numberMaskSerializer);
         module.addSerializer(short.class, numberMaskSerializer);
+        module.addSerializer(MultipartFile.class, multipartMaskSerializer);
         mapper.registerModule(module);
         mapper.findAndRegisterModules();
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'H:m:ssZ"));
