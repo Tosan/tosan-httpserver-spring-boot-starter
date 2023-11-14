@@ -147,7 +147,7 @@ host: localhost:53454
 connection: keep-alive
 content-length: 73
 
-{"name":"mina","family":"kh","pan":"*SEMI_ENCRYPTED:403948******3094","test":"test*****","date":"2022-08-05T12:54:01.523+00:00"}
+{"name":"mina","family":"kh","pan":"*SEMI_ENCRYPTED:403948******3094","test":"test*****","date":"2022-08-05T12:54:01.523+00:00", "mobile": "*SEMI_ENCRYPTED:0911***4506"}
 
 
 -- Http Response --
@@ -376,7 +376,8 @@ request:
       "family" : "kh",
       "pan" : "*SEMI_ENCRYPTED:403948******3094",
       "test" : "test*****",
-      "date" : "2022-08-05T17:20:40+0430"
+      "date" : "2022-08-05T17:20:40+0430",
+      "mobile" : "*SEMI_ENCRYPTED:0911***4506"
     }
   }
 } 
