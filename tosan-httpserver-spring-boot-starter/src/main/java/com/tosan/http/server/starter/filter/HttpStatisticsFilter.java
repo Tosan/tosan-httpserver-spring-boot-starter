@@ -41,6 +41,7 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     private static final ArrayList<String> STATISTICS_DEFAULT_EXCLUDE_URL_PATTERNS = new ArrayList<>() {{
         add(Constants.DEFAULT_SWAGGER_EXCLUDE_PATTERN);
         add(Constants.DEFAULT_API_DOCS_EXCLUDE_PATTERN);
+        add(Constants.DEFAULT_API_DOCS_V3_EXCLUDE_PATTERN);
         add(Constants.DEFAULT_FAVICON_EXCLUDE_PATTERN);
         add(Constants.DEFAULT_ACTUATOR_EXCLUDE_PATTERN);
     }};

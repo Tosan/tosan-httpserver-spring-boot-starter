@@ -25,6 +25,7 @@ public interface Constants {
     String DEFAULT_ACTUATOR_EXCLUDE_PATTERN = "/actuator/**";
     String DEFAULT_SWAGGER_EXCLUDE_PATTERN = "/swagger-ui/**";
     String DEFAULT_API_DOCS_EXCLUDE_PATTERN = "/api-docs/**";
+    String DEFAULT_API_DOCS_V3_EXCLUDE_PATTERN = "/v3/api-docs/**";
     String DEFAULT_FAVICON_EXCLUDE_PATTERN = "/favicon.ico";
 
     /**
