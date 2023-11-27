@@ -45,7 +45,7 @@ public abstract class OncePerRequestFilterBase extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        if (excludeUrlPatterns == null || excludeUrlPatterns.size() <= 0) {
+        if (excludeUrlPatterns == null || excludeUrlPatterns.size() == 0) {
             return false;
         }
         return excludeUrlPatterns.stream()
