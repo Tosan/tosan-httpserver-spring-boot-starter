@@ -49,6 +49,8 @@ public abstract class OncePerRequestFilterBase extends OncePerRequestFilter {
             return false;
         }
         return excludeUrlPatterns.stream()
-                .anyMatch(excludeUrl -> antPathMatcher.match(excludeUrl, request.getServletPath()));
+                .anyMatch(excludeUrl -> antPathMatcher.match(excludeUrl, request.getServletPath())
+                        || antPathMatcher.match(excludeUrl, request.getRequestURI()))
+                || (request.getQueryString() != null && request.getQueryString().equalsIgnoreCase("wsdl"));
     }
 }
