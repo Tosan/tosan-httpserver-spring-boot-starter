@@ -14,6 +14,6 @@ public class ByteArraySerializer extends JsonSerializer<byte[]> {
 
     @Override
     public void serialize(byte[] value, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
-        jsonGenerator.writeString("*MASKED");
+        jsonGenerator.writeString("*MASKED with size = " + value.length);
     }
 }
