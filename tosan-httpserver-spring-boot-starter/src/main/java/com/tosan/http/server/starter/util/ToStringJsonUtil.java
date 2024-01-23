@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.tosan.http.server.starter.logger.MultipartMaskSerializer;
-import com.tosan.http.server.starter.logger.NumberMaskSerializer;
-import com.tosan.http.server.starter.logger.SerializerUtility;
-import com.tosan.http.server.starter.logger.StringMaskSerializer;
+import com.tosan.http.server.starter.logger.*;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,6 +42,7 @@ public class ToStringJsonUtil {
         module.addSerializer(float.class, numberMaskSerializer);
         module.addSerializer(double.class, numberMaskSerializer);
         module.addSerializer(short.class, numberMaskSerializer);
+        module.addSerializer(byte[].class, new ByteArraySerializer());
         module.addSerializer(MultipartFile.class, multipartMaskSerializer);
         mapper.registerModule(module);
         mapper.findAndRegisterModules();
