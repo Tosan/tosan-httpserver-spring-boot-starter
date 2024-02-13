@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
  * @since 10/26/2022
  */
 public class AspectUtil {
+
+    @SuppressWarnings("unchecked, rawtypes")
     public <T extends Annotation> T getAnnotation(ProceedingJoinPoint pjp, Class clazz) {
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
         Method method = methodSignature.getMethod();

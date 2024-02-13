@@ -25,7 +25,7 @@ public class MdcUtil {
 
     public void extractHeaderMdcParameters(HttpServletRequest request) {
         List<HttpHeaderMdcParameter> parameters = mdcFilterConfig.getParameters();
-        if (parameters != null && parameters.size() > 0) {
+        if (parameters != null && !parameters.isEmpty()) {
             for (HttpHeaderMdcParameter headerMdcParameter : parameters) {
                 String value = request.getHeader(headerMdcParameter.getHeaderParameterName());
                 processMdcParameter(headerMdcParameter, value);
@@ -82,7 +82,6 @@ public class MdcUtil {
         }
         if (clientIp != null) {
             MDC.put(Constants.MDC_CLIENT_IP, clientIp.trim());
-            MDC.put(Constants.MDC_CLIENT_FREE_IP, (replaceUnfreeChars(clientIp)).trim());
         }
     }
 

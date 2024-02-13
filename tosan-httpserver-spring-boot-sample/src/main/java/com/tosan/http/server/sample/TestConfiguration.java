@@ -71,8 +71,7 @@ public class TestConfiguration {
         list.add(freeUserIp);
         char[] unfreeCharacters = {'/', '\\', '*', '?', '"'};
         char newCharacter = '-';
-        MdcFilterConfig mdcFilterConfig = new MdcFilterConfig(list, unfreeCharacters, newCharacter);
-        return mdcFilterConfig;
+        return new MdcFilterConfig(list, unfreeCharacters, newCharacter);
     }
 
     @Bean

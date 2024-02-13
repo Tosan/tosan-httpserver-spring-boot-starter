@@ -22,17 +22,17 @@ import static org.mockito.Mockito.*;
  * @author AmirHossein ZamanZade
  * @since 10/29/2022
  */
+@SuppressWarnings("unchecked")
 public class HttpLogUtilUTest {
-
     private HttpLogUtil httpLogUtil;
     private JsonReplaceHelperDecider replaceHelperDecider;
     private CustomHttpServletRequestWrapper request;
     private ContentCachingResponseWrapper response;
     private JsonReplaceResultDto jsonReplaceResultDto;
-    private String testMethod = "POST";
-    private String testUri = "/test";
+    private final String testMethod = "POST";
+    private final String testUri = "/test";
     private CustomHttpServletRequestWrapper.CachedServletInputStream inputStream;
-    private Integer responseStatus = 200;
+    private final Integer responseStatus = 200;
     private LogContentProvider logContentProvider;
 
     @BeforeEach

@@ -15,7 +15,6 @@ public class HttpHeaderMdcParameter {
     private RandomParameter randomParameter;
 
     private HttpHeaderMdcParameter() {
-
     }
 
     public String getHeaderParameterName() {
@@ -52,9 +51,8 @@ public class HttpHeaderMdcParameter {
 
     public static class HttpHeaderMdcParameterBuilder {
         private static final Logger LOGGER = LoggerFactory.getLogger(HttpHeaderMdcParameterBuilder.class);
-
-        private String headerParameterName;
-        private String mdcParametersName;
+        private final String headerParameterName;
+        private final String mdcParametersName;
         private boolean removeUnfreeCharacters;
         private RandomParameter randomParameter;
 

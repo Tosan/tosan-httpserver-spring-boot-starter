@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.slf4j.MDC;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 
