@@ -9,12 +9,18 @@ import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.logger.JsonServiceLogger;
+import com.tosan.http.server.starter.metrics.MeterFilterConfig;
+import com.tosan.http.server.starter.metrics.util.MeterUtil;
 import com.tosan.http.server.starter.util.*;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
 import com.tosan.tools.mask.starter.replace.JacksonReplaceHelper;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import com.tosan.tools.mask.starter.replace.RegexReplaceHelper;
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.config.MeterFilter;
+import io.micrometer.core.instrument.config.MeterFilterReply;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,6 +32,7 @@ import org.springframework.validation.BindingResult;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -156,5 +163,40 @@ public class HttpServerUtilConfiguration {
     public ToStringJsonUtil toStringJsonUtil(@Qualifier("http-server-util-regex-replace-helper")
                                                          JsonReplaceHelperDecider jsonReplaceHelperDecider) {
         return new ToStringJsonUtil(jsonReplaceHelperDecider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "metric.util.enable", havingValue = "true")
+    public MeterUtil meterUtil() {
+        return new MeterUtil();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MeterFilterConfig meterFilterConfig() {
+        return new MeterFilterConfig();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "metric.filter.enable", havingValue = "true")
+    public MeterFilter meterFilter(MeterFilterConfig meterFilterConfig) {
+        return new MeterFilter() {
+            @Override
+            public MeterFilterReply accept(Meter.Id id) {
+                if (meterFilterConfig.getFilteredMeterNames() != null && Arrays.asList(meterFilterConfig.getFilteredMeterNames()).contains(id.getName())) {
+                    return MeterFilterReply.DENY;
+                }
+                if (meterFilterConfig.getFilteredMeterTags() != null && !meterFilterConfig.getFilteredMeterTags().isEmpty()) {
+                    for (String key : meterFilterConfig.getFilteredMeterTags().keySet()) {
+                        if (id.getTags().contains(Tag.of(key, meterFilterConfig.getFilteredMeterTags().get(key)))) {
+                            return MeterFilterReply.DENY;
+                        }
+                    }
+                }
+                return MeterFilterReply.NEUTRAL;
+            }
+        };
     }
 }
