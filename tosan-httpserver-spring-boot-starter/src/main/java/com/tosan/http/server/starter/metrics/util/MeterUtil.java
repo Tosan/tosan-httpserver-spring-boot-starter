@@ -70,20 +70,20 @@ public class MeterUtil {
     }
 
     private Meter getMeter(MeterType meterType, String meterName, String description, Tags tags) {
-        switch (meterType) {
-            case COUNTER: {
-                return registerCounterMeter(meterName, description, tags);
-            }
-            case TIMER: {
-                return registerTimerMeter(meterName, description, tags);
-            }
-            case GAUGE: {
-                return registerGaugeMeter(meterName, description, tags);
-            }
-            default: {
-                return null;
+        if (meterType != null) {
+            switch (meterType) {
+                case COUNTER: {
+                    return registerCounterMeter(meterName, description, tags);
+                }
+                case TIMER: {
+                    return registerTimerMeter(meterName, description, tags);
+                }
+                case GAUGE: {
+                    return registerGaugeMeter(meterName, description, tags);
+                }
             }
         }
+        return null;
     }
 
     private String createKey(String meterName, Tags tags) {
