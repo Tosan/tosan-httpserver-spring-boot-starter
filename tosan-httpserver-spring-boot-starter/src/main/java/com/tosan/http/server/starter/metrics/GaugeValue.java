@@ -1,21 +1,23 @@
 package com.tosan.http.server.starter.metrics;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Shahryar Safizadeh
  * @since 2/13/2024
  */
 public class GaugeValue {
-    private int value = 0;
+    private static final AtomicInteger value = new AtomicInteger(0);
 
     public void increment() {
-        value++;
+        value.incrementAndGet();
     }
 
     public void decrement() {
-        value--;
+        value.decrementAndGet();
     }
 
-    public int getValue() {
+    public AtomicInteger getValue() {
         return value;
     }
 }

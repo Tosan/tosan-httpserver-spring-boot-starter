@@ -3,6 +3,8 @@ package com.tosan.http.server.starter.metrics.util;
 import com.tosan.http.server.starter.metrics.GaugeValue;
 import com.tosan.http.server.starter.metrics.enumuration.MeterType;
 import io.micrometer.core.instrument.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
  */
 public class MeterUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeterUtil.class);
     private MeterRegistry meterRegistry;
     private final Map<String, Meter> meters = new HashMap<>();
     private final Map<String, GaugeValue> gaugeMeters = new HashMap<>();
@@ -83,6 +86,7 @@ public class MeterUtil {
                 }
             }
         }
+        LOGGER.error("No meterType selected.");
         return null;
     }
 

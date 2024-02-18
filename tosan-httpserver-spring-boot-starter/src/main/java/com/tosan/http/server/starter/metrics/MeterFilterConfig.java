@@ -13,22 +13,22 @@ import java.util.Map;
 @Validated
 public class MeterFilterConfig {
 
-    private String[] filteredMeterNames;
-    private Map<String, String> filteredMeterTags;
+    private String[] excludedMeterNames;
+    private Map<String, String> excludedMeterTags;
 
-    public String[] getFilteredMeterNames() {
-        return filteredMeterNames;
+    public String[] getExcludedMeterNames() {
+        return excludedMeterNames;
     }
 
-    public void setFilteredMeterNames(String[] filteredMeterNames) {
-        this.filteredMeterNames = filteredMeterNames;
+    public void setExcludedMeterNames(String[] excludedMeterNames) {
+        this.excludedMeterNames = excludedMeterNames;
     }
 
-    public Map<String, String> getFilteredMeterTags() {
-        return filteredMeterTags;
+    public Map<String, String> getExcludedMeterTags() {
+        return excludedMeterTags;
     }
 
-    public void setFilteredMeterTags(Map<String, String> filteredMeterTags) {
-        this.filteredMeterTags = filteredMeterTags;
+    public void setExcludedMeterTags(Map<String, String> excludedMeterTags) {
+        this.excludedMeterTags = excludedMeterTags;
     }
 }

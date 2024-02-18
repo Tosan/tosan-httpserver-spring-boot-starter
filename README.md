@@ -418,6 +418,68 @@ serviceLog.enabled =false
 ```
 
 attention: if you have any input of type HttpServletRequest, this input will be ignored in logging.
+### Metrics
+one of our goals is the ability of monitoring the application performance by defining proper metrics and registering them
+via prometheus registry. to accomplish this, we provided a way for registering your custom metrics and update them whenever you want.
+additionally, you can exclude your unwanted metrics to have cleaner and more customized prometheus report.
+#### registering metrics
+for registering metrics, first we define a default bean as below:
+```
+    @Bean
+    @ConditionalOnMissingBean
+    public MeterUtil meterUtil() {
+        return new MeterUtil();
+    }
+```
+we have 3 types of metric : TIMER , COUNTER , GAUGE. you can register your custom metrics with one of these types as shown below :
+```
+    meterUtil.registerMeter(MeterType.Timer,
+                            "meterName",
+                            "description",
+                            tags); 
+```
+as you see, you should specify your metric with a valid type and a name. additionally, if wanted, you can add description or tags to your registering metric.
+#### updating metrics
+we have three types of metric that for each one, we provided a proper updating mechanism:
+1. updating COUNTER meter: by updating this type of meter you will increment the value of it.<br>
+   example:
+```
+    meterUtil.updateCounterMeter("meterName", tags);
+```
+- note : you can pass null instead of _tags_ if you did not specify tags for your metric in the first place.
+
+2.updating TIMER meter: by updating the timer meter, you can record your wanted duration in milliseconds.<br>
+example:
+```
+    meterUtil.updateTimerMeter("meterName", tags, 1000);
+```
+- note : you can pass null instead of _tags_ if you did not specify tags for your metric in the first place.
+
+3.updating GAUGE meter: by updating this type, you can both increment and decrement the value of it.<br>
+example:
+```
+    meterUtil.updateGaugeMeterByIncrementing("meterName", tags);
+    
+    meterUtil.updateGaugeMeterByDecrementing("meterName", tags);
+```
+- note : you can pass null instead of _tags_ if you did not specify tags for your metric in the first place.
+
+#### excluding metrics
+in order of excluding wanted metrics from prometheus metrics, we define two ways of exclusion:
+1. excluding metrics by metric name <br>
+- with the config below, you can simply tell us which metric names you want to exclude:
+```
+    metric.filter.excluded-meter-names=meterName1,meterName2,meterName3
+```
+2. excluding metrics by metric tags
+- with the config below, you can specify the tags you want the metrics having them to be excluded:
+```
+    metric.filter.excluded-meter-tags.key1=value1
+    
+    metric.filter.excluded-meter-tags.key2=value2
+```
+- note that basically a tag includes a key and a value in it, and the above example represents that
+  as a user, we want to exclude metrics with tag1(key1,value1) and tag2(key2,value2).
 
 ### Sample Project
 You can find a sample project in tosan-httpserver-spring-boot-sample module
