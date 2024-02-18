@@ -9,6 +9,9 @@ import com.tosan.http.server.starter.filter.HttpLoggingFilter;
 import com.tosan.http.server.starter.filter.HttpMdcFilter;
 import com.tosan.http.server.starter.filter.HttpStatisticsFilter;
 import com.tosan.http.server.starter.logger.JsonServiceLogger;
+import com.tosan.http.server.starter.metrics.MeterFilterConfig;
+import com.tosan.http.server.starter.metrics.MetricFilter;
+import com.tosan.http.server.starter.metrics.util.MeterUtil;
 import com.tosan.http.server.starter.util.*;
 import com.tosan.tools.mask.starter.config.SecureParameter;
 import com.tosan.tools.mask.starter.config.SecureParametersConfig;
@@ -158,5 +161,24 @@ public class HttpServerUtilConfiguration {
     public ToStringJsonUtil toStringJsonUtil(@Qualifier("http-server-util-regex-replace-helper")
                                              JsonReplaceHelperDecider jsonReplaceHelperDecider) {
         return new ToStringJsonUtil(jsonReplaceHelperDecider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MeterUtil meterUtil() {
+        return new MeterUtil();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MeterFilterConfig meterFilterConfig() {
+        return new MeterFilterConfig();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "metric.filter.enable", havingValue = "true")
+    public MetricFilter metricFilter(MeterFilterConfig meterFilterConfig) {
+        return new MetricFilter(meterFilterConfig);
     }
 }
