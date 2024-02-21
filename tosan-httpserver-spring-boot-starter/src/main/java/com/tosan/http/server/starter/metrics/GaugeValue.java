@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2/13/2024
  */
 public class GaugeValue {
-    private static final AtomicInteger value = new AtomicInteger(0);
+    private final AtomicInteger value = new AtomicInteger(0);
 
     public void increment() {
         value.incrementAndGet();

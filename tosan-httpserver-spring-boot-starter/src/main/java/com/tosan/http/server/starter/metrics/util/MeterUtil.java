@@ -38,6 +38,16 @@ public class MeterUtil {
         return meters.get(key);
     }
 
+    public Meter registerMeter(String meterName, String description, Tags tags, Long value) {
+        String key = createKey(meterName, tags);
+        if (!meters.containsKey(key)) {
+            synchronized (meters) {
+                meters.computeIfAbsent(key, ignore -> registerFixedGaugeMeter(meterName, description, tags, value));
+            }
+        }
+        return meters.get(key);
+    }
+
     public void updateTimerMeter(String metricName, Tags tags, long duration) {
         String key = createKey(metricName, tags);
         if (!meters.isEmpty() && meters.get(key) != null) {
@@ -54,12 +64,19 @@ public class MeterUtil {
         }
     }
 
+    public void updateCounterMeterByFixedAmount(String metricName, Tags tags, double amount) {
+        String key = createKey(metricName, tags);
+        if (!meters.isEmpty() && meters.get(key) != null) {
+            Meter meter = meters.get(key);
+            ((Counter) meter).increment(amount);
+        }
+    }
+
     public void updateGaugeMeterByIncrementing(String metricName, Tags tags) {
         String key = createKey(metricName, tags);
         if (!meters.isEmpty() && gaugeMeters.get(key) != null) {
             GaugeValue gaugeValue = gaugeMeters.get(createKey(metricName, tags));
             gaugeValue.increment();
-            gaugeMeters.put(createKey(metricName, tags), gaugeValue);
         }
     }
 
@@ -68,7 +85,6 @@ public class MeterUtil {
         if (!gaugeMeters.isEmpty() && gaugeMeters.get(key) != null) {
             GaugeValue gaugeValue = gaugeMeters.get(createKey(metricName, tags));
             gaugeValue.decrement();
-            gaugeMeters.put(createKey(metricName, tags), gaugeValue);
         }
     }
 
@@ -143,6 +159,21 @@ public class MeterUtil {
                     .register(meterRegistry);
         }
         gaugeMeters.put(createKey(metricName, tags), gaugeValue);
+        return gauge;
+    }
+
+    private Gauge registerFixedGaugeMeter(String metricName, String desctiption, Tags tags, Long value) {
+        Gauge gauge;
+        if (tags == null) {
+            gauge = Gauge.builder(metricName, value::longValue)
+                    .description(desctiption)
+                    .register(meterRegistry);
+        } else {
+            gauge = Gauge.builder(metricName, value::longValue)
+                    .description(desctiption)
+                    .tags(tags)
+                    .register(meterRegistry);
+        }
         return gauge;
     }
 }
