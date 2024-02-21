@@ -145,16 +145,16 @@ public class MeterUtil {
         }
     }
 
-    private Gauge registerGaugeMeter(String metricName, String desctiption, Tags tags) {
+    private Gauge registerGaugeMeter(String metricName, String description, Tags tags) {
         GaugeValue gaugeValue = new GaugeValue();
         Gauge gauge;
         if (tags == null) {
             gauge = Gauge.builder(metricName, gaugeValue::getValue)
-                    .description(desctiption)
+                    .description(description)
                     .register(meterRegistry);
         } else {
             gauge = Gauge.builder(metricName, gaugeValue::getValue)
-                    .description(desctiption)
+                    .description(description)
                     .tags(tags)
                     .register(meterRegistry);
         }
@@ -162,15 +162,15 @@ public class MeterUtil {
         return gauge;
     }
 
-    private Gauge registerFixedGaugeMeter(String metricName, String desctiption, Tags tags, Long value) {
+    private Gauge registerFixedGaugeMeter(String metricName, String description, Tags tags, Long value) {
         Gauge gauge;
         if (tags == null) {
             gauge = Gauge.builder(metricName, value::longValue)
-                    .description(desctiption)
+                    .description(description)
                     .register(meterRegistry);
         } else {
             gauge = Gauge.builder(metricName, value::longValue)
-                    .description(desctiption)
+                    .description(description)
                     .tags(tags)
                     .register(meterRegistry);
         }
