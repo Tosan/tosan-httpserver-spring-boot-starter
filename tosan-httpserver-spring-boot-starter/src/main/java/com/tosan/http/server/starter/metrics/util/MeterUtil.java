@@ -38,7 +38,7 @@ public class MeterUtil {
         return meters.get(key);
     }
 
-    public Meter registerMeter(String meterName, String description, Tags tags, Long value) {
+    public Meter registerFixedInitGaugeMeter(String meterName, String description, Tags tags, Long value) {
         String key = createKey(meterName, tags);
         if (!meters.containsKey(key)) {
             synchronized (meters) {

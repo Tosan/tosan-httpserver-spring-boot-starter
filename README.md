@@ -443,7 +443,7 @@ we have 3 types of metric : TIMER , COUNTER , GAUGE. you can register your custo
 as you see, you should specify your metric with a valid type and a name. additionally, if wanted, you can add description or tags to your registering metric.<br>
 you can also register a gauge meter with specifying its initial value:
 ```
-    meterUtil.registerMeter("meterName",
+    meterUtil.registerFixedInitGaugeMeter("meterName",
                             "description",
                             tags,
                             initialValue); 
