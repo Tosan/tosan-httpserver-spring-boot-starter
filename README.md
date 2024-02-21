@@ -438,13 +438,26 @@ we have 3 types of metric : TIMER , COUNTER , GAUGE. you can register your custo
                             "description",
                             tags); 
 ```
-as you see, you should specify your metric with a valid type and a name. additionally, if wanted, you can add description or tags to your registering metric.
+as you see, you should specify your metric with a valid type and a name. additionally, if wanted, you can add description or tags to your registering metric.<br>
+you can also register a gauge meter with specifying its initial value:
+```
+    meterUtil.registerFixedInitGaugeMeter("meterName",
+                            "description",
+                            tags,
+                            initialValue); 
+```
+note that the initialValue is Long and this kind of gauge metric can not be updated by incrementing or decrementing its value.
+
 #### updating metrics
 we have three types of metric that for each one, we provided a proper updating mechanism:
 1. updating COUNTER meter: by updating this type of meter you will increment the value of it.<br>
    example:
 ```
     meterUtil.updateCounterMeter("meterName", tags);
+```
+and if you want to increment your counter metric by an specified amount (double):
+```
+    meterUtil.updateCounterMeter("meterName", tags, amount);
 ```
 - note : you can pass null instead of _tags_ if you did not specify tags for your metric in the first place.
 
