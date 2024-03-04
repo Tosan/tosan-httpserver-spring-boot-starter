@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.io.IOException;
  * @author mina khoshnevisan
  * @since 7/16/2022
  */
-@Order(10)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class HttpMdcFilter extends OncePerRequestFilterBase {
 
     private final MdcUtil mdcLogUtil;
