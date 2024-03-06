@@ -68,24 +68,25 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
         try {
             filterChain.doFilter(request, response);
         } finally {
-            end(serviceName, startTime);
+            end(serviceName, response.getStatus(), startTime);
         }
     }
 
     private void start(String serviceName) {
         final Map<String, Object> inwardLog = new LinkedHashMap<>();
         inwardLog.put("+service", serviceName);
-        inwardLog.put("active requests", activeRequestsCount.incrementAndGet());
+        inwardLog.put("active-requests", activeRequestsCount.incrementAndGet());
         LOGGER.info(writeJson(inwardLog));
     }
 
-    private void end(String serviceName, long startTime) {
+    private void end(String serviceName, int statusCode, long startTime) {
         double duration = (System.currentTimeMillis() - startTime) / 1000.0;
         final Map<String, Object> outwardLog = new LinkedHashMap<>();
         outwardLog.put("-service", serviceName);
+        outwardLog.put("status", statusCode);
         List<ServiceExecutionInfo> serviceExecutionInfos = Statistics.getApplicationStatistics().getServiceExecutionsInfo();
         outwardLog.put("duration", duration + "s");
-        outwardLog.put("active requests", activeRequestsCount.decrementAndGet());
+        outwardLog.put("active-requests", activeRequestsCount.decrementAndGet());
         if (!serviceExecutionInfos.isEmpty()) {
             outwardLog.put("statistics", generateStatisticsDetail(serviceExecutionInfos));
         }
