@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.tosan.http.server.starter.logger.DateSerializer;
 import com.tosan.http.server.starter.logger.NumberMaskSerializer;
 import com.tosan.http.server.starter.logger.SerializerUtility;
 import com.tosan.http.server.starter.logger.StringMaskSerializer;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Mostafa Abdollahi
@@ -42,6 +44,8 @@ public class ToStringJsonUtil {
         module.addSerializer(float.class, numberMaskSerializer);
         module.addSerializer(double.class, numberMaskSerializer);
         module.addSerializer(short.class, numberMaskSerializer);
+        DateSerializer dateSerializer = new DateSerializer(serializerUtility);
+        module.addSerializer(Date.class, dateSerializer);
         mapper.registerModule(module);
         mapper.findAndRegisterModules();
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'H:m:ssZ"));
