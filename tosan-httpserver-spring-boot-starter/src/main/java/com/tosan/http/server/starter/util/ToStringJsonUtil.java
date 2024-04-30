@@ -11,6 +11,7 @@ import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Mostafa Abdollahi
@@ -43,6 +44,8 @@ public class ToStringJsonUtil {
         module.addSerializer(double.class, numberMaskSerializer);
         module.addSerializer(short.class, numberMaskSerializer);
         module.addSerializer(byte[].class, new ByteArraySerializer());
+        DateSerializer dateSerializer = new DateSerializer(serializerUtility);
+        module.addSerializer(Date.class, dateSerializer);
         module.addSerializer(MultipartFile.class, multipartMaskSerializer);
         mapper.registerModule(module);
         mapper.findAndRegisterModules();
