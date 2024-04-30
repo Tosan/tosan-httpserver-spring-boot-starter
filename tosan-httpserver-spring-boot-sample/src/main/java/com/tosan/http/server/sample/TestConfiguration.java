@@ -49,6 +49,7 @@ public class TestConfiguration {
         securedParameters.add(new SecureParameter("age", UserMaskType.LEFT, ComparisonType.EQUALS_IGNORE_CASE));
         securedParameters.add(new SecureParameter("average", UserMaskType.RIGHT, ComparisonType.LIKE));
         securedParameters.add(new SecureParameter("length", UserMaskType.SEMI, ComparisonType.LIKE));
+        securedParameters.add(new SecureParameter("date", UserMaskType.COMPLETE));
         return new SecureParametersConfig(securedParameters);
     }
 
