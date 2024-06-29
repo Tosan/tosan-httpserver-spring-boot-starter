@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author mina khoshnevisan
  * @since 7/20/2022
  */
-@Order(20)
+@Order(-290)
 public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpStatisticsFilter.class);
     private static final AtomicLong activeRequestsCount = new AtomicLong(0);

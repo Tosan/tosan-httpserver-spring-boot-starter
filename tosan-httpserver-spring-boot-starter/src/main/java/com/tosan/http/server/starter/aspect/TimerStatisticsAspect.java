@@ -6,7 +6,6 @@ import com.tosan.http.server.starter.util.TimerStatisticsUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 /**
@@ -14,7 +13,7 @@ import org.springframework.core.annotation.Order;
  * @since 10/22/2022
  */
 @Aspect
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(20)
 public class TimerStatisticsAspect {
 
     private final TimerStatisticsUtil timerStatisticsUtil;

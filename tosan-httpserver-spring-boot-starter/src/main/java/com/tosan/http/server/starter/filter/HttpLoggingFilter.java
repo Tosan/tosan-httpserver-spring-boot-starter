@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
@@ -23,7 +22,7 @@ import java.util.Collections;
  * @author M.khoshnevisan
  * @since 4/21/2021
  */
-@Order(Ordered.HIGHEST_PRECEDENCE + 1)
+@Order(-280)
 public class HttpLoggingFilter extends OncePerRequestFilterBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpLoggingFilter.class);
