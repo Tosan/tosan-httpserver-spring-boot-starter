@@ -18,7 +18,9 @@ it as a maven dependency and enable the desired functionality.
 
 ### mdc filter
 one of the common requirements of Http server is providing correct mdc parameters in order to trace request easily. 
-to reach this goal a filter name HttpMdcFilter is provided. this bean is defined by default as below:
+to reach this goal a filter name HttpMdcFilter is provided.
+The order of this filter is -300.
+this bean is defined by default as below:
 ```
     @Bean
     @ConditionalOnMissingBean
@@ -268,8 +270,9 @@ your required comparison type can be specified in each securedParameter as below
    securedParameters.add(new SecureParameter("pan", UserMaskType.PAN, ComparisonType.RIGHT_LIKE));
 ```
 
-for logging data a bean of type HttpLoggingFilter is provided by default as below. this bean exlude actuator url pattern
+for logging data a bean of type HttpLoggingFilter is provided by default as below. this bean excludes actuator url pattern
 (/actuator/*) by default.
+The order of this filter is -280. 
 ```
     @Bean
     @ConditionalOnMissingBean
@@ -308,6 +311,7 @@ masking will be applied for :
 
 ### statistics filter
 HttpStatisticsFilter is created for purpose of logging simple metrics about http requests.
+The order of this filter is -290
 this filter logs some metrics as below:
 on request:
 ```
