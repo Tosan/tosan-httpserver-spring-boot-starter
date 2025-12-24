@@ -17,6 +17,21 @@ public class MetricFilter implements MeterFilter {
 
     @Override
     public MeterFilterReply accept(Meter.Id id) {
+
+        if (meterFilterConfig.getInclude() != null) {
+            for (FilterRule rule : meterFilterConfig.getInclude()) {
+
+                if (!id.getName().equals(rule.getName())) continue;
+
+                boolean tagsMatch = rule.getTags().entrySet().stream()
+                        .allMatch(e -> id.getTags().contains(Tag.of(e.getKey(), e.getValue())));
+
+                if (tagsMatch) {
+                    return MeterFilterReply.ACCEPT;
+                }
+            }
+        }
+
         if (meterFilterConfig.getExcludedMeterNames() != null && Arrays.asList(meterFilterConfig.getExcludedMeterNames()).contains(id.getName())) {
             return MeterFilterReply.DENY;
         }
