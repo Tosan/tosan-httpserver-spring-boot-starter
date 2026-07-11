@@ -132,8 +132,6 @@ servlet api in order to work with different web servers. these embedded web serv
 
 > jetty
 
-> undertow
-
 sample of http request and response is logged as below:
 ```
 -- Http Request --
