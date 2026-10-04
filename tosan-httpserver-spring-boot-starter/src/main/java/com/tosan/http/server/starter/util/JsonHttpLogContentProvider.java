@@ -1,12 +1,13 @@
 package com.tosan.http.server.starter.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.tosan.http.server.starter.wrapper.LogContentContainer;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,14 +18,13 @@ import java.util.Map;
  */
 public class JsonHttpLogContentProvider extends LogContentProvider {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    static {
-        MAPPER.enable(SerializationFeature.INDENT_OUTPUT)
-                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
+    private static final ObjectMapper MAPPER = JsonMapper.builder()
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .changeDefaultPropertyInclusion(incl ->
+                    JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .build();
 
     @Override
     protected String generateRequestLogContent(LogContentContainer container) {
@@ -75,7 +75,7 @@ public class JsonHttpLogContentProvider extends LogContentProvider {
     private String toJson(Object value) {
         try {
             return MAPPER.writeValueAsString(value);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return "error creating json. " + e.getMessage();
         }
     }

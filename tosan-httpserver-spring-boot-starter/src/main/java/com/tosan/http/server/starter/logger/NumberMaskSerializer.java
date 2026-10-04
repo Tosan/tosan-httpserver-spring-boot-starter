@@ -1,12 +1,11 @@
 package com.tosan.http.server.starter.logger;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class NumberMaskSerializer extends JsonSerializer<Number> {
+public class NumberMaskSerializer extends ValueSerializer<Number> {
 
     private SerializerUtility serializerUtility;
 
@@ -14,8 +13,8 @@ public class NumberMaskSerializer extends JsonSerializer<Number> {
         this.serializerUtility = serializerUtility;
     }
 
-    public void serialize(Number value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-            throws IOException {
+    public void serialize(Number value, JsonGenerator jsonGenerator, SerializationContext serializers)
+            throws JacksonException {
         serializerUtility.serialize(value.toString(), jsonGenerator);
     }
 }
