@@ -1,10 +1,9 @@
 package com.tosan.http.server.starter.logger;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonStreamContext;
 import com.tosan.tools.mask.starter.replace.JsonReplaceHelperDecider;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.TokenStreamContext;
 
 public class SerializerUtility {
     private final JsonReplaceHelperDecider jsonReplaceHelperDecider;
@@ -13,12 +12,12 @@ public class SerializerUtility {
         this.jsonReplaceHelperDecider = jsonReplaceHelperDecider;
     }
 
-    public void serialize(String value, JsonGenerator jsonGenerator) throws IOException {
-        String fieldName = jsonGenerator.getOutputContext().getCurrentName();
+    public void serialize(String value, JsonGenerator jsonGenerator) throws JacksonException {
+        String fieldName = jsonGenerator.streamWriteContext().currentName();
         if (fieldName == null) {
-            JsonStreamContext parent = jsonGenerator.getOutputContext().getParent();
+            TokenStreamContext parent = jsonGenerator.streamWriteContext().getParent();
             if (parent != null) {
-                fieldName = parent.getCurrentName();
+                fieldName = parent.currentName();
             }
         }
         if (value == null) {

@@ -1,19 +1,19 @@
 package com.tosan.http.server.starter.logger;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * @author AmirHossein ZamanZade
  * @since 1/23/2024
  */
-public class ByteArraySerializer extends JsonSerializer<byte[]> {
+public class ByteArraySerializer extends ValueSerializer<byte[]> {
 
     @Override
-    public void serialize(byte[] value, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
+    public void serialize(byte[] value, JsonGenerator jsonGenerator, SerializationContext serializers)
+            throws JacksonException {
         jsonGenerator.writeString("*MASKED with size = " + value.length);
     }
 }

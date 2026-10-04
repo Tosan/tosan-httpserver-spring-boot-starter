@@ -1,12 +1,6 @@
 package com.tosan.http.server.starter.filter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.tosan.http.server.starter.statistics.ServiceExecutionInfo;
 import com.tosan.http.server.starter.statistics.Statistics;
 import com.tosan.http.server.starter.util.Constants;
@@ -18,6 +12,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.util.DefaultPrettyPrinter;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,12 +48,14 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     }};
 
     static {
-        mapper = new ObjectMapper()
-                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         printer = new DefaultPrettyPrinter().withObjectIndenter(new DefaultPrettyPrinter.FixedSpaceIndenter());
-        writer = mapper.writer(printer);
+        mapper = JsonMapper.builder()
+                .changeDefaultPropertyInclusion(incl ->
+                        JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .build();
+        writer = mapper.writer().with(printer);
     }
 
     public HttpStatisticsFilter() {
@@ -113,7 +116,7 @@ public class HttpStatisticsFilter extends OncePerRequestFilterBase {
     protected static String writeJson(Object object) {
         try {
             return writer.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return "error creating json. " + e.getMessage();
         }
     }
